@@ -76,6 +76,7 @@ button:hover:not(:disabled),.btn:hover{filter:brightness(1.08)}button:active:not
 .tag{display:inline-block;font:700 12px 'DM Sans',sans-serif;color:var(--scn);background:color-mix(in srgb,var(--scn) 16%,transparent);border-radius:99px;padding:3px 10px}
 .rtx{background:var(--in);border:1px solid var(--bd);border-radius:12px;padding:12px;margin:10px 0;font:14px/1.5 ui-monospace,Menlo,Consolas,monospace;word-break:break-all;white-space:pre-wrap;max-height:220px;overflow:auto}
 .ii{width:92px;display:inline-block;padding:6px 8px}.pr{padding:10px 0;border-bottom:1px solid var(--bd);line-height:2.4}.pr:last-child{border:0}
+.tn{text-align:left;margin:6px 0}.tn summary{cursor:pointer;font-weight:700;padding:6px 0}#sPt{text-align:left;border-top:1px solid var(--bd);margin-top:8px;padding-top:8px}#sPc .chip{min-width:38px;justify-content:center}
 </style></head><body><div class="w">
 <header><div class="logo" onclick="location.hash=''"><span class="lg"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10"/></svg></span><div>PDF<span>Studio</span></div></div><button class="ghost" id="th" aria-label="Toggle dark mode"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg></button></header>
 <main id="home"><div class="hero"><h1>Every PDF and photo tool, in one tab.</h1><p>Scan documents and QR codes with your camera, then merge, split, compress, crop and resize files. Plus everyday tools like calculators, converters and a timer. Everything runs on your device, so your files are never uploaded.</p></div>
@@ -89,6 +90,7 @@ button:hover:not(:disabled),.btn:hover{filter:brightness(1.08)}button:active:not
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
 <script>
 const $=s=>document.querySelector(s),L=PDFLib,P=pdfjsLib;
 try{P.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'}catch(e){}
@@ -320,7 +322,7 @@ function detect(s){const SW=s.videoWidth||s.width,SH=s.videoHeight||s.height,k=M
  if(!best||best.s<.55)return null;let Q=best.Q;if(polyArea(Q)<0)Q.reverse();let f=0,fv=1e9;Q.forEach((p,i)=>{if(p[0]+p[1]<fv){fv=p[0]+p[1];f=i}});Q=Q.slice(f).concat(Q.slice(0,f));
  let q=Q.map(p=>[cl(p[0]/w,0,1),cl(p[1]/h,0,1)]);const cx0=q.reduce((t,a)=>t+a[0],0)/4,cy0=q.reduce((t,a)=>t+a[1],0)/4;q=q.map(a=>[cx0+(a[0]-cx0)*.99,cy0+(a[1]-cy0)*.99]);q.s=best.s;return q}
 
-function render(p,maxD){const s=p.src,sw=s.width,sh=s.height,q=p.q.map(a=>[a[0]*sw,a[1]*sh]),dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+function render0(p,maxD){const s=p.src,sw=s.width,sh=s.height,q=p.q.map(a=>[a[0]*sw,a[1]*sh]),dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
  let w=Math.max(dist(q[0],q[1]),dist(q[3],q[2])),h=Math.max(dist(q[0],q[3]),dist(q[1],q[2]));const k=Math.min(1,maxD/Math.max(w,h));w=Math.max(8,Math.round(w*k));h=Math.max(8,Math.round(h*k));
  if(!p.sd){const t=document.createElement('canvas');t.width=sw;t.height=sh;const tx=t.getContext('2d',{willReadFrequently:true});tx.drawImage(s,0,0);p.sd=tx.getImageData(0,0,sw,sh).data}
  const sd=p.sd,o=document.createElement('canvas');o.width=w;o.height=h;const ox=o.getContext('2d',{willReadFrequently:true}),D=ox.createImageData(w,h),dd=D.data;
@@ -343,44 +345,81 @@ function enh(o,m,br,ct){const w=o.width,h=o.height,x=o.getContext('2d',{willRead
  else{const T=Uint8ClampedArray.from({length:256},(_,v)=>bc(m=='bw'?(v-170)*8+128:m=='orig'?v:(v-45)*255/190));for(let i=0;i<n*4;i+=4)for(let c=0;c<3;c++)d[i+c]=T[c][d[i+c]]}
  x.putImageData(I,0,0)}
 
+
+/* ===== v4: Snapseed-style engine ===== */
+function deshadow(c,k){const w=c.width,h=c.height,x=c.getContext('2d',{willReadFrequently:true}),I=x.getImageData(0,0,w,h),d=I.data,sw=Math.max(8,w/24|0),sh=Math.max(8,h/24|0),s=document.createElement('canvas');s.width=sw;s.height=sh;const sx=s.getContext('2d',{willReadFrequently:true});sx.drawImage(c,0,0,sw,sh);const S=sx.getImageData(0,0,sw,sh),a=S.data;
+ for(let r=0;r<2;r++){const b=new Uint8ClampedArray(a);for(let j=0;j<sh;j++)for(let i=0;i<sw;i++)for(let ch=0;ch<3;ch++){let m=0;for(let dj=-1;dj<=1;dj++)for(let di=-1;di<=1;di++){const jj=j+dj,ii=i+di;if(jj>=0&&jj<sh&&ii>=0&&ii<sw)m=Math.max(m,b[(jj*sw+ii)*4+ch])}a[(j*sw+i)*4+ch]=m}}
+ sx.putImageData(S,0,0);const B=document.createElement('canvas');B.width=w;B.height=h;const bx=B.getContext('2d',{willReadFrequently:true});bx.imageSmoothingQuality='high';bx.drawImage(s,0,0,w,h);const bd=bx.getImageData(0,0,w,h).data;
+ for(let i=0;i<d.length;i+=4)for(let ch=0;ch<3;ch++){const t=d[i+ch]/Math.max(40,bd[i+ch])*255;d[i+ch]=d[i+ch]*(1-k)+t*k}x.putImageData(I,0,0)}
+function sharpen(c,k){const w=c.width,h=c.height,x=c.getContext('2d',{willReadFrequently:true}),I=x.getImageData(0,0,w,h),d=I.data,s=document.createElement('canvas');s.width=Math.max(1,w>>1);s.height=Math.max(1,h>>1);s.getContext('2d').drawImage(c,0,0,s.width,s.height);const B=document.createElement('canvas');B.width=w;B.height=h;const bx=B.getContext('2d',{willReadFrequently:true});bx.imageSmoothingQuality='high';bx.drawImage(s,0,0,w,h);const b=bx.getImageData(0,0,w,h).data;
+ for(let i=0;i<d.length;i+=4)for(let ch=0;ch<3;ch++)d[i+ch]+=(d[i+ch]-b[i+ch])*k*2;x.putImageData(I,0,0)}
+/* p.a = global tune, p.pts = radius points {x,y,r,br,ct,sat,sh,wm}; coordinates are 0..1 of the final image, r is a share of the longest side */
+function adj(c,p){const A=p.a||{},P=p.pts||[];if(A.ds)deshadow(c,A.ds/100);if(A.sp)sharpen(c,A.sp/100);
+ const w=c.width,h=c.height,M=Math.max(w,h),x=c.getContext('2d',{willReadFrequently:true}),I=x.getImageData(0,0,w,h),d=I.data;
+ const tn=(i,t,k)=>{const r0=d[i],g0=d[i+1],b0=d[i+2],L=(r0*.299+g0*.587+b0*.114)/255,ad=((t.br||0)*2.55+(t.sh||0)*.9*(1-L)*(1-L)+(t.hi||0)*.9*L*L)*k,m=1+(t.ct||0)/100*k,wm=(t.wm||0)*.45*k,ti=(t.ti||0)*.3*k,sa=1+(t.sat||0)/100*k,
+  r=(r0-128)*m+128+ad+wm+ti/2,g=(g0-128)*m+128+ad-ti,b=(b0-128)*m+128+ad-wm+ti/2,y=r*.299+g*.587+b*.114;d[i]=y+(r-y)*sa;d[i+1]=y+(g-y)*sa;d[i+2]=y+(b-y)*sa};
+ if(['sat','sh','hi','wm','ti','br','ct'].some(k=>A[k]))for(let i=0;i<d.length;i+=4)tn(i,A,1);
+ for(const t of P){const cx=t.x*w,cy=t.y*h,R=Math.max(4,t.r*M),R2=R*R;for(let y=Math.max(0,(cy-R)|0);y<Math.min(h,cy+R+1);y++)for(let X=Math.max(0,(cx-R)|0);X<Math.min(w,cx+R+1);X++){const q=((X-cx)**2+(y-cy)**2)/R2;if(q<1)tn((y*w+X)*4,t,(1-q)**2)}}
+ x.putImageData(I,0,0)}
+function render(p,maxD){const A=p.a||{},P=p.pts||[],k=[p.q.join(),p.f,p.br,p.ct,p.rot].join('|');if(p.bk!=k){p.bk=k;p.bc={}}
+ let b=maxD<=1000&&p.bc[maxD];if(!b){b=render0(p,maxD);if(maxD<=1000)p.bc[maxD]=b}
+ if(!P.length&&!Object.values(A).some(Boolean))return b;const c=document.createElement('canvas');c.width=b.width;c.height=b.height;c.getContext('2d',{willReadFrequently:true}).drawImage(b,0,0);adj(c,p);return c}
+
 async function fit(c,t,lim,q){let b=await blobOf(c,t,q);if(!lim||t=='image/png'||b.size<=lim)return b;let s=1,x=b;
  for(let n=0;n<9;n++){let cc=c;if(s<1){cc=document.createElement('canvas');cc.width=Math.round(c.width*s);cc.height=Math.round(c.height*s);cc.getContext('2d').drawImage(c,0,0,cc.width,cc.height)}
   let lo=.3,hi=q;x=await blobOf(cc,t,lo);if(x.size>lim){s*=.8;continue}for(let i=0;i<6;i++){const m=(lo+hi)/2,y=await blobOf(cc,t,m);if(y.size<=lim){x=y;lo=m}else hi=m}return x}return x}
 
-function scanUI(el){let pg=[],ci=-1,mode='crop',drag=-1,stream=null,timer=null;const FL=[['auto','Auto','spark'],['magic','Magic color','wand'],['orig','Original','image'],['gray','Gray','file'],['bw','B&W','scan']];
+function scanUI(el){let pg=[],ci=-1,mode='crop',drag=-1,stream=null,timer=null,ps=-1,pdrag=-1;const Z=()=>({sat:0,sh:0,hi:0,wm:0,ti:0,ds:0,sp:0}),TN=[['sat','Saturation'],['sh','Shadows'],['hi','Highlights'],['wm','Warmth'],['ti','Tint'],['ds','Remove shadow',0],['sp','Sharpen',0]],PS=[['r','Radius',5,60],['br','Brightness'],['ct','Contrast'],['sat','Saturation'],['sh','Shadows'],['wm','Warmth']],rg=(a,k,s)=>`<div class="f"><label>${s[1]}</label><input type="range" ${k}="${s[0]}" min="${s[2]??-100}" max="${s[3]??100}" value="0"></div>`;const FL=[['auto','Auto','spark'],['magic','Magic color','wand'],['orig','Original','image'],['gray','Gray','file'],['bw','B&W','scan']];
  el.innerHTML=`<div class="scn"><div class="panel"><div class="sbt"><button id="sCam">${ic('camera')} Scan with camera</button><label class="btn ghost">${ic('upload')} Upload photos<input type="file" id="sUp" accept="image/*" multiple hidden></label><label class="btn ghost">${ic('camera')} Phone camera app<input type="file" id="sCap" accept="image/*" capture="environment" hidden></label></div>
  <div class="pg" id="sTh" style="margin-top:12px;max-height:460px"></div><div id="st" role="status"></div><small class="mut" id="sHint">Add one or more pages. Edges are found automatically and you can fine-tune the corners.</small></div>
- <div class="panel ctr" id="sEd" hidden><div class="seg" id="sMd"><button class="chip on" data-m="crop">${ic('crop',16)} Edges</button><button class="chip" data-m="res">${ic('eye',16)} Result</button></div><canvas id="sc"></canvas>
+ <div class="panel ctr" id="sEd" hidden><div class="seg" id="sMd"><button class="chip on" data-m="crop">${ic('crop',16)} Edges</button><button class="chip" data-m="res">${ic('eye',16)} Result</button><button class="chip" data-m="pt">${ic('wand',16)} Points</button></div><canvas id="sc"></canvas>
  <div class="seg" id="sFl">${FL.map(f=>`<button class="chip" data-f="${f[0]}">${ic(f[2],16)} ${f[1]}</button>`).join('')}</div>
  <div class="sl"><div class="f"><label>Brightness</label><input type="range" id="sBr" min="-50" max="50" value="0"></div><div class="f"><label>Contrast</label><input type="range" id="sCt" min="-50" max="80" value="0"></div></div>
- <label class="mut"><input type="checkbox" id="sAll" checked> Apply filter to all pages</label>
+ <details class="tn" open><summary>Tune (like Snapseed)</summary><div class="sl" id="sTn">${TN.map(s=>rg(0,'data-a',s)).join('')}</div><div class="seg"><button class="ghost" id="sAS">${ic('wand',16)} Auto shadow fix</button><button class="ghost" id="sTr">Reset tune</button></div></details><div id="sPt" hidden><b>Radius points</b> <small class="mut">for one spot only, like Selective in Snapseed</small><div class="seg" id="sPc"></div><div class="sl" id="sPs">${PS.map(s=>rg(0,'data-pp',s)).join('')}</div><div class="seg"><button class="ghost" id="sPd">${ic('trash',16)} Remove point</button><button class="ghost" id="sPa">Remove all points</button></div><small class="mut">Tap the page to add a point (up to 12). Drag a dot to move it. Tap a dot to select it.</small></div><label class="mut"><input type="checkbox" id="sAll" checked> Apply filter and tune to all pages (points stay on their own page)</label>
  <div class="seg"><button class="ghost" id="sDet">${ic('wand',16)} Auto edges</button><button class="ghost" id="sFull">${ic('full',16)} Full page</button><button class="ghost" id="sRot">${ic('rotate',16)} Rotate</button><button class="ghost" id="sL">${ic('left',16)}</button><button class="ghost" id="sR" style="transform:scaleX(-1)">${ic('left',16)}</button><button class="ghost" id="sDel">${ic('trash',16)} Delete</button></div></div></div>
  <div class="panel" id="sEx" style="margin-top:20px" hidden><h2 style="font-size:20px">${ic('download')} Export</h2><div class="opts">${sel('xf','Export as',[['pdf','PDF document'],['jpg','JPG images'],['png','PNG images'],['webp','WebP images']])+sel('xp','PDF page size',[['a4','A4'],['letter','US Letter'],['fit','Same as scan']])+sel('xr','Resolution',[[1000,'Small (1000 px)'],[1600,'Standard (1600 px)'],[2400,'High (2400 px)']]).replace('value="1600"','value="1600" selected')+inp('q','Quality %',90,'range','min=40 max=100')+KB+inp('nm','File name','scan-'+new Date().toISOString().slice(0,10))}</div>
  <small class="mut">The size limit is for the whole PDF, or for each image.</small><button class="big" id="sGo" style="margin-top:10px">${ic('download')} Export</button><div id="out"></div></div>`;
  const cvs=$('#sc'),cx=cvs.getContext('2d');
  const th=p=>p.th||(p.th=render(p,150).toDataURL('image/jpeg',.6));
  function thumbs(){$('#sTh').innerHTML=pg.map((p,i)=>`<div class="cell ${i==ci?'on':''}" data-i="${i}"><img src="${th(p)}" alt="Page ${i+1}"><span>${i+1}</span></div>`).join('');$('#sEd').hidden=$('#sEx').hidden=!pg.length;$('#sHint').textContent=pg.length?pg.length+' page'+(pg.length>1?'s':'')+' · tap a page to edit':'Add one or more pages. Edges are found automatically and you can fine-tune the corners.';
-  if(pg[ci]){$('#sBr').value=pg[ci].br;$('#sCt').value=pg[ci].ct;document.querySelectorAll('#sFl .chip').forEach(b=>b.classList.toggle('on',b.dataset.f==pg[ci].f))}}
+  if(pg[ci]){document.querySelectorAll('[data-a]').forEach(i=>i.value=pg[ci].a[i.dataset.a]||0);$('#sBr').value=pg[ci].br;$('#sCt').value=pg[ci].ct;document.querySelectorAll('#sFl .chip').forEach(b=>b.classList.toggle('on',b.dataset.f==pg[ci].f))}}
  function show(){const p=pg[ci];if(!p)return;if(mode=='crop'){const s=p.src,k=Math.min(1,720/s.width),W=cvs.width=Math.round(s.width*k),H=cvs.height=Math.round(s.height*k);cx.drawImage(s,0,0,W,H);const q=p.q.map(a=>[a[0]*W,a[1]*H]);
    cx.fillStyle='rgba(0,0,0,.5)';cx.beginPath();cx.rect(0,0,W,H);cx.moveTo(...q[0]);q.slice(1).forEach(a=>cx.lineTo(...a));cx.closePath();cx.fill('evenodd');cx.strokeStyle='#2f5bff';cx.lineWidth=3;cx.beginPath();q.forEach((a,i)=>i?cx.lineTo(...a):cx.moveTo(...a));cx.closePath();cx.stroke();
-   q.forEach(a=>{cx.fillStyle='#fff';cx.beginPath();cx.arc(a[0],a[1],12,0,7);cx.fill();cx.stroke()})}else{const r=render(p,900);cvs.width=r.width;cvs.height=r.height;cx.drawImage(r,0,0)}}
- const sel1=i=>{ci=i;thumbs();show()},touch=p=>{p.th=null};
+   q.forEach(a=>{cx.fillStyle='#fff';cx.beginPath();cx.arc(a[0],a[1],12,0,7);cx.fill();cx.stroke()})}else{const r=render(p,900);cvs.width=r.width;cvs.height=r.height;cx.drawImage(r,0,0);if(mode=='pt')dots()}}
+ const sel1=i=>{ci=i;ps=-1;thumbs();ptUI();show()},touch=p=>{p.th=null};
  async function addC(c0){const k=Math.min(1,2200/Math.max(c0.width,c0.height)),c=document.createElement('canvas');c.width=Math.round(c0.width*k);c.height=Math.round(c0.height*k);c.getContext('2d').drawImage(c0,0,0,c.width,c.height);
-  const p={src:c,q:detect(c)||DEFQ.map(a=>a.slice()),f:'auto',br:0,ct:0,rot:0};if(pg[0]){p.f=pg[0].f;p.br=pg[0].br;p.ct=pg[0].ct}pg.push(p);sel1(pg.length-1)}
+  const p={src:c,q:detect(c)||DEFQ.map(a=>a.slice()),f:'auto',br:0,ct:0,rot:0,a:Z(),pts:[]};if(pg[0]){p.f=pg[0].f;p.br=pg[0].br;p.ct=pg[0].ct;p.a={...pg[0].a}}pg.push(p);sel1(pg.length-1)}
  async function addF(list){for(const f of list){if(!f.type.startsWith('image/'))continue;$('#st').textContent='Reading '+f.name+'…';const bm=await createImageBitmap(f,{imageOrientation:'from-image'}).catch(()=>createImageBitmap(f));await addC(bm)}$('#st').textContent='';}
  $('#sUp').onchange=e=>{addF(e.target.files);e.target.value=''};$('#sCap').onchange=e=>{addF(e.target.files);e.target.value=''};
  $('#sTh').onclick=e=>{const c=e.target.closest('.cell');if(c)sel1(+c.dataset.i)};
- $('#sMd').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;mode=b.dataset.m;document.querySelectorAll('#sMd .chip').forEach(x=>x.classList.toggle('on',x==b));show()};
+ $('#sMd').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;mode=b.dataset.m;document.querySelectorAll('#sMd .chip').forEach(x=>x.classList.toggle('on',x==b));ptUI();show()};
  const each=fn=>{(($('#sAll').checked)?pg:[pg[ci]]).forEach(p=>{fn(p);touch(p)});thumbs();show()};
  $('#sFl').onclick=e=>{const b=e.target.closest('.chip');if(b&&pg[ci])each(p=>p.f=b.dataset.f)};
  $('#sBr').oninput=()=>pg[ci]&&each(p=>p.br=+$('#sBr').value);$('#sCt').oninput=()=>pg[ci]&&each(p=>p.ct=+$('#sCt').value);
+ /* Snapseed-style tune + radius points */
+ const cP=()=>pg[ci]&&pg[ci].pts[ps];
+ const dots=()=>{const p=pg[ci],W=cvs.width,H=cvs.height,M=Math.max(W,H);p.pts.forEach((t,i)=>{const on=i==ps;cx.beginPath();cx.arc(t.x*W,t.y*H,t.r*M,0,7);cx.setLineDash([9,6]);cx.strokeStyle='#0008';cx.lineWidth=5;cx.stroke();cx.strokeStyle=on?'#6f8bff':'#fff';cx.lineWidth=2.5;cx.stroke();cx.setLineDash([]);cx.fillStyle=on?'#2f5bff':'#fff';cx.strokeStyle='#000';cx.lineWidth=1.5;cx.beginPath();cx.arc(t.x*W,t.y*H,11,0,7);cx.fill();cx.stroke();cx.fillStyle=on?'#fff':'#000';cx.font='bold 12px sans-serif';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(i+1,t.x*W,t.y*H)})};
+ function ptUI(){const p=pg[ci];$('#sPt').hidden=mode!='pt'||!p;if(!p)return;$('#sPc').innerHTML=p.pts.map((t,i)=>`<button class="chip${i==ps?' on':''}" data-i="${i}">${i+1}</button>`).join('')||'<small class="mut">No points yet. Tap the page.</small>';const t=cP();$('#sPs').style.display=$('#sPd').style.display=t?'':'none';$('#sPa').style.display=p.pts.length?'':'none';
+  if(t)document.querySelectorAll('[data-pp]').forEach(i=>i.value=i.dataset.pp=='r'?t.r*100:t[i.dataset.pp]||0)}
+ function ptDown(e){const p=pg[ci],r=cvs.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;let b=-1,bd=34;p.pts.forEach((t,i)=>{const d=Math.hypot((t.x-x)*r.width,(t.y-y)*r.height);if(d<bd){bd=d;b=i}});
+  if(b<0){if(p.pts.length>=12)return st('Up to 12 points per page. Remove one to add another.',1);p.pts.push({x,y,r:.2,br:0,ct:0,sat:0,sh:0,wm:0});b=p.pts.length-1}
+  ps=b;pdrag=b;cvs.setPointerCapture(e.pointerId);ptUI();show()}
+ function ptMove(e){const t=cP(),r=cvs.getBoundingClientRect();if(!t)return;t.x=cl((e.clientX-r.left)/r.width,0,1);t.y=cl((e.clientY-r.top)/r.height,0,1);show()}
+ $('#sTn').oninput=e=>{const k=e.target.dataset.a;if(k&&pg[ci])each(p=>p.a[k]=+e.target.value)};
+ $('#sAS').onclick=()=>{if(pg[ci])each(p=>{p.a.ds=70;p.a.sh=Math.max(p.a.sh,35)})};
+ $('#sTr').onclick=()=>{if(pg[ci])each(p=>{p.a=Z();p.br=p.ct=0})};
+ $('#sPc').onclick=e=>{const b=e.target.closest('[data-i]');if(b){ps=+b.dataset.i;ptUI();show()}};
+ $('#sPs').oninput=e=>{const t=cP(),k=e.target.dataset.pp;if(t&&k){t[k]=k=='r'?e.target.value/100:+e.target.value;show()}};
+ $('#sPs').onchange=()=>{touch(pg[ci]);thumbs()};
+ $('#sPd').onclick=()=>{const p=pg[ci];if(p&&ps>=0){p.pts.splice(ps,1);ps=-1;touch(p);thumbs();ptUI();show()}};
+ $('#sPa').onclick=()=>{const p=pg[ci];if(p){p.pts=[];ps=-1;touch(p);thumbs();ptUI();show()}};
  $('#sDet').onclick=()=>{const p=pg[ci];p.q=detect(p.src)||DEFQ.map(a=>a.slice());touch(p);thumbs();show()};$('#sFull').onclick=()=>{pg[ci].q=[[0,0],[1,0],[1,1],[0,1]];touch(pg[ci]);thumbs();show()};
- $('#sRot').onclick=()=>{const p=pg[ci];p.rot=(p.rot+90)%360;touch(p);thumbs();if(mode=='res')show()};
- $('#sDel').onclick=()=>{pg.splice(ci,1);ci=Math.min(ci,pg.length-1);thumbs();show()};
+ $('#sRot').onclick=()=>{const p=pg[ci];p.rot=(p.rot+90)%360;p.pts.forEach(t=>{[t.x,t.y]=[1-t.y,t.x]});touch(p);thumbs();if(mode!='crop')show()};
+ $('#sDel').onclick=()=>{ps=-1;pg.splice(ci,1);ci=Math.min(ci,pg.length-1);thumbs();ptUI();show()};
  const mv=k=>{const j=ci+k;if(j<0||j>=pg.length)return;[pg[ci],pg[j]]=[pg[j],pg[ci]];ci=j;thumbs()};$('#sL').onclick=()=>mv(-1);$('#sR').onclick=()=>mv(1);
- cvs.onpointerdown=e=>{if(mode!='crop'||!pg[ci])return;const r=cvs.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;let b=-1,bd=40;pg[ci].q.forEach((a,i)=>{const d=Math.hypot((a[0]-x)*r.width,(a[1]-y)*r.height);if(d<bd){bd=d;b=i}});if(b>=0){drag=b;cvs.setPointerCapture(e.pointerId)}};
- cvs.onpointermove=e=>{if(drag<0)return;const r=cvs.getBoundingClientRect();pg[ci].q[drag]=[cl((e.clientX-r.left)/r.width,0,1),cl((e.clientY-r.top)/r.height,0,1)];show()};
- cvs.onpointerup=()=>{if(drag>=0){drag=-1;touch(pg[ci]);thumbs()}};
+ cvs.onpointerdown=e=>{if(mode=='pt'&&pg[ci])return ptDown(e);if(mode!='crop'||!pg[ci])return;const r=cvs.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;let b=-1,bd=40;pg[ci].q.forEach((a,i)=>{const d=Math.hypot((a[0]-x)*r.width,(a[1]-y)*r.height);if(d<bd){bd=d;b=i}});if(b>=0){drag=b;cvs.setPointerCapture(e.pointerId)}};
+ cvs.onpointermove=e=>{if(pdrag>=0)return ptMove(e);if(drag<0)return;const r=cvs.getBoundingClientRect();pg[ci].q[drag]=[cl((e.clientX-r.left)/r.width,0,1),cl((e.clientY-r.top)/r.height,0,1)];show()};
+ cvs.onpointerup=()=>{if(pdrag>=0){pdrag=-1;touch(pg[ci]);thumbs();ptUI()}if(drag>=0){drag=-1;touch(pg[ci]);thumbs()}};
  /* live camera with auto-capture */
  $('#sCam').onclick=async()=>{try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}}})}catch(e){st('Live camera is not available here ('+(e.name||'error')+'). Use "Phone camera app" or upload photos instead.',1);return}
   const m=document.createElement('div');m.className='cam';m.innerHTML=`<div class="camb"><div class="vw"><video playsinline muted autoplay></video><canvas class="ov"></canvas></div></div><div class="camc"><label><input type="checkbox" id="cA" checked> Auto-capture</label><button class="big" id="cS">${ic('camera')} Capture</button><button class="ghost" id="cD">Done (${pg.length})</button></div>`;document.body.append(m);
@@ -506,17 +545,40 @@ const timerUI=el=>{let mode='s',run=0,acc=0,t0=0,tick=0,laps=[],tot=3e5;
  $('#tmIn').oninput=()=>{if(!run&&!acc){tot=inTot();draw()}};$('#tmIn').onclick=e=>{const b=e.target.closest('[data-p]');if(b){$('#tmMin').value=b.dataset.p;$('#tmSec').value=0;if(!run){acc=0;tot=inTot();btn();draw()}}};
  CL.push(()=>clearInterval(tick));reset()};
 
+/* ---------- Photo Enhancer (Snapseed-style, any photo) ---------- */
+const enhUI=el=>{let bm=null,A={},nm='photo',raf=0;const S=[['br','Brightness'],['ct','Contrast'],['sat','Saturation'],['sh','Shadows'],['hi','Highlights'],['wm','Warmth'],['ti','Tint'],['ds','Remove shadow',0],['sp','Sharpen',0]];
+ el.innerHTML=`<div class="two"><div class="panel"><label class="drop"><input type="file" id="eF" accept="image/*" hidden><b>Choose a photo</b> or drop / paste it</label><div class="opts">${S.map(s=>`<div class="f"><label>${s[1]}</label><input type="range" data-e="${s[0]}" min="${s[2]??-100}" max="100" value="0"></div>`).join('')}</div><div class="seg"><button class="ghost" id="eAs">${ic('wand',16)} Auto shadow fix</button><button class="ghost" id="eR">Reset</button></div></div><div class="panel ctr"><canvas id="eC" width="300" height="200"></canvas><div class="seg"><button id="eJ">${ic('download',16)} JPG</button><button class="ghost" id="eP">${ic('download',16)} PNG</button></div></div></div>`;
+ const mk=m=>{const k=Math.min(1,m/Math.max(bm.width,bm.height)),c=document.createElement('canvas');c.width=Math.round(bm.width*k);c.height=Math.round(bm.height*k);c.getContext('2d',{willReadFrequently:true}).drawImage(bm,0,0,c.width,c.height);adj(c,{a:A});return c};
+ const draw=()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{if(!bm)return;const c=mk(900),d=$('#eC');d.width=c.width;d.height=c.height;d.getContext('2d').drawImage(c,0,0)})};
+ const sync=()=>document.querySelectorAll('[data-e]').forEach(i=>i.value=A[i.dataset.e]||0);
+ const load=async f=>{if(!f||!f.type.startsWith('image/'))return;bm=await createImageBitmap(f,{imageOrientation:'from-image'}).catch(()=>createImageBitmap(f));nm=base(f);A={};sync();draw()};
+ el.oninput=e=>{const k=e.target.dataset.e;if(k){A[k]=+e.target.value;draw()}};
+ $('#eF').onchange=e=>{load(e.target.files[0]);e.target.value=''};const dz=$('.drop');dz.ondragover=e=>e.preventDefault();dz.ondrop=e=>{e.preventDefault();load(e.dataTransfer.files[0])};
+ $('#eAs').onclick=()=>{A.ds=70;A.sh=35;sync();draw()};$('#eR').onclick=()=>{A={};sync();draw()};
+ $('#eJ').onclick=async()=>{if(bm)dlb(await blobOf(mk(3500),'image/jpeg',.92),nm+'-enhanced.jpg')};$('#eP').onclick=async()=>{if(bm)dlb(await blobOf(mk(3500),'image/png'),nm+'-enhanced.png')};
+ const pst=e=>{if(cur&&cur.id=='enh')load([...e.clipboardData.files].find(isI))};addEventListener('paste',pst);CL.push(()=>removeEventListener('paste',pst))};
+
+/* ---------- Image to Text (OCR) ---------- */
+const ocrUI=el=>{el.innerHTML=`<div class="panel"><label class="drop"><input type="file" id="oF" accept="image/*" hidden><b>Choose a photo of text</b> or drop / paste it</label><div class="opts">${sel('ol','Language',[['eng','English'],['ben','Bengali'],['hin','Hindi'],['eng+ben','English + Bengali']])}</div><div id="st" role="status">The first run downloads the language data, so you need internet once.</div><textarea id="oT" rows="10" placeholder="The recognised text appears here"></textarea><div class="seg" style="justify-content:flex-start"><button class="ghost" id="oC">${ic('copy',16)} Copy</button><button class="ghost" id="oD">${ic('download',16)} Download .txt</button></div></div>`;
+ const go=async f=>{if(!f||!f.type.startsWith('image/'))return st('Please choose an image file.',1);if(!window.Tesseract)return st('The text reader could not load. Check your internet and reload.',1);st('Starting…');
+  try{const r=await Tesseract.recognize(f,o('ol'),{logger:m=>m.status&&st(m.status+(m.progress?' '+Math.round(m.progress*100)+'%':''))}),t=r.data.text.trim();$('#oT').value=t;st(t?'Done. Check the text for small mistakes.':'No text found. Try a sharper, brighter photo.',!t)}catch(e){st('Could not read the text: '+(e.message||e),1)}};
+ $('#oF').onchange=e=>{go(e.target.files[0]);e.target.value=''};const dz=$('.drop');dz.ondragover=e=>e.preventDefault();dz.ondrop=e=>{e.preventDefault();go(e.dataTransfer.files[0])};
+ $('#oC').onclick=e=>cpy(e.currentTarget,$('#oT').value);$('#oD').onclick=()=>dlb(new Blob([$('#oT').value],{type:'text/plain'}),'text.txt');
+ const pst=e=>{if(cur&&cur.id=='ocr')go([...e.clipboardData.files].find(isI))};addEventListener('paste',pst);CL.push(()=>removeEventListener('paste',pst))};
+
 const NT=[
  {id:'qrs',c:'scan',nw:1,n:'QR & Barcode Scanner',d:'Scan QR codes and barcodes with your camera or from a picture. Open links, copy text, read Wi-Fi codes.',custom:qrsUI},
  {id:'unit',c:'hdy',nw:1,n:'Unit Converter',d:'Length, weight, area, volume, speed, time, data and temperature.',custom:unitUI},
  {id:'age',c:'hdy',nw:1,n:'Age & Date Calculator',d:'Exact age, next birthday and days between two dates.',custom:ageUI},
  {id:'calc',c:'hdy',nw:1,n:'Percent & Loan Calculator',d:'Percentages, discounts, tax and monthly loan payments (EMI).',custom:calcUI},
  {id:'txt',c:'hdy',nw:1,n:'Text Tools',d:'Change case, fix spaces, remove blank or duplicate lines, sort and reverse.',custom:txtUI},
- {id:'timer',c:'hdy',nw:1,n:'Stopwatch & Timer',d:'Stopwatch with laps, and a countdown timer with an alarm.',custom:timerUI}];
+ {id:'timer',c:'hdy',nw:1,n:'Stopwatch & Timer',d:'Stopwatch with laps, and a countdown timer with an alarm.',custom:timerUI},
+ {id:'enh',c:'img',nw:1,n:'Photo Enhancer',d:'Snapseed-style tune: brightness, shadows, highlights, warmth, saturation, shadow removal and sharpen.',custom:enhUI},
+ {id:'ocr',c:'scan',nw:1,n:'Image to Text (OCR)',d:'Read text from a photo or scan in English, Bengali or Hindi. Copy or save it as .txt.',custom:ocrUI}];
 T.splice(1,0,NT[0]);T.push(...NT.slice(1));
 }
 
-{const IM={scan:'scan',merge:'merge',split:'split',rotate:'rotate',pnum:'pnum',wm:'wm',compress:'compress',p2i:'p2i',i2p:'i2p',resize:'resize',qr:'qr',pass:'pass',count:'count',qrs:'qrscan',unit:'unit',age:'age',calc:'calc',txt:'txt',timer:'timer'};T.forEach(t=>t.i=ic(IM[t.id]||'file',26))}
+{const IM={scan:'scan',merge:'merge',split:'split',rotate:'rotate',pnum:'pnum',wm:'wm',compress:'compress',p2i:'p2i',i2p:'i2p',resize:'resize',qr:'qr',pass:'pass',count:'count',qrs:'qrscan',unit:'unit',age:'age',calc:'calc',txt:'txt',timer:'timer',enh:'wand',ocr:'txt'};T.forEach(t=>t.i=ic(IM[t.id]||'file',26))}
 CC.scan='var(--scn)';
 
 grid();
