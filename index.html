@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PDF Studio – free PDF, photo & QR tools</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=DM+Sans:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#eef1f7;--card:#fff;--tx:#0f172a;--mut:#64708a;--bd:#dde2ee;--ac:#2f5bff;--pdf:#ff5a4f;--img:#12b5a6;--hdy:#f5a524;--in:#f7f9fd;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0b1020;--card:#141a30;--tx:#eaeefb;--mut:#93a0c0;--bd:#263050;--in:#0f1528;color-scheme:dark}}
+:root[data-theme=dark]{--bg:#0b1020;--card:#141a30;--tx:#eaeefb;--mut:#93a0c0;--bd:#263050;--in:#0f1528;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 'DM Sans',system-ui,sans-serif}
+h1,h2{font-family:'Bricolage Grotesque','DM Sans',sans-serif;margin:0;letter-spacing:-.02em}
+.w{max-width:1040px;margin:0 auto;padding:20px 18px 60px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
+.logo{font:800 22px 'Bricolage Grotesque',sans-serif;cursor:pointer}.logo span{color:var(--pdf)}
+button,.btn{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:10px 16px;background:var(--ac);color:#fff;font-weight:700;text-decoration:none;display:inline-block}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible,.drop:focus-within{outline:3px solid var(--ac);outline-offset:2px}
+button:disabled{opacity:.4;cursor:not-allowed}.ghost{background:transparent;color:var(--tx);border:1px solid var(--bd)}.big{width:100%;padding:14px;font-size:17px}
+.hero h1{font-size:clamp(32px,6vw,54px);line-height:1.05;max-width:640px}.hero p{color:var(--mut);max-width:560px;margin:12px 0 22px}
+.bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px}
+input,select,textarea{font:inherit;color:var(--tx);background:var(--in);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;width:100%}
+.bar input{flex:1;min-width:200px}.chip{width:auto;background:var(--card);color:var(--tx);border:1px solid var(--bd)}.chip.on{background:var(--tx);color:var(--bg)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--bd);border-left:5px solid var(--c);border-radius:14px;padding:16px;color:inherit;text-decoration:none;display:block;transition:transform .15s,border-color .15s}
+.card:hover{transform:translateY(-3px);border-color:var(--c)}.card i{font-style:normal;font-size:28px}.card b{display:block;margin-top:6px}.card small,.mut,small{color:var(--mut)}
+.back{background:none;color:var(--ac);padding:0 0 12px}
+.drop{display:block;border:2px dashed var(--bd);border-radius:16px;padding:34px 16px;text-align:center;cursor:pointer;background:var(--card);margin:16px 0}.drop.on,.drop:hover{border-color:var(--ac)}.drop .ar{font-size:34px}
+.f{display:flex;flex-direction:column;gap:5px}.f label{font-size:14px;font-weight:700}.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:16px 0}
+input[type=color]{padding:3px;height:42px}input[type=range]{padding:0}input[type=checkbox]{width:auto}
+.row{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:8px 12px;margin-top:8px}.row>div{flex:1;min-width:0}.row b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.row img{width:48px;height:48px;object-fit:cover;border-radius:8px}.row button{padding:6px 10px}
+.row code{word-break:break-all;flex:1}
+#st{margin:12px 0;font-weight:700}#st.er{color:var(--pdf)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}@media(max-width:760px){.two{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:18px}.panel canvas{max-width:100%;height:auto;border-radius:8px}.ctr{text-align:center}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:12px}.stats div{background:var(--in);border-radius:10px;padding:10px}.stats b{font:800 24px 'Bricolage Grotesque',sans-serif;display:block}
+.th{width:44px;height:56px;object-fit:cover;border-radius:6px;background:var(--in);flex:none}#pv{margin:16px 0}
+.pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px;max-height:430px;overflow:auto;padding:4px}
+.cell{position:relative;aspect-ratio:3/4;border:2px solid var(--bd);border-radius:8px;overflow:hidden;cursor:pointer;background:var(--in);display:flex;align-items:center;justify-content:center}
+.cell img{max-width:100%;max-height:100%;object-fit:contain;transition:transform .25s}.cell span{position:absolute;left:4px;bottom:4px;background:var(--tx);color:var(--bg);font-size:12px;border-radius:6px;padding:0 6px}
+.cell.on{border-color:var(--ac)}.cell.off{opacity:.35;filter:grayscale(1)}.cell.rm{border-color:var(--pdf)}.cell.rm::after{content:'✕';position:absolute;inset:0;display:grid;place-items:center;font-size:34px;color:var(--pdf);background:#ff5a4f33}
+#pv canvas{max-width:100%;height:auto;border:1px solid var(--bd);border-radius:6px}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:14px}.cmp img{width:100%;max-height:300px;object-fit:contain;background:var(--in);border-radius:8px;display:block;margin:6px 0}.cmp b{font-size:14px}
+footer{margin-top:40px;color:var(--mut);font-size:14px}
+
+:root{--scn:#8b5cf6}
+body{background:radial-gradient(900px 420px at 0 -8%,color-mix(in srgb,var(--ac) 16%,transparent),transparent),radial-gradient(800px 420px at 100% 0,color-mix(in srgb,var(--pdf) 12%,transparent),transparent),var(--bg);background-attachment:fixed}
+.ic{flex:none}
+button,.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:12px;transition:filter .15s,transform .1s}
+button:hover:not(:disabled),.btn:hover{filter:brightness(1.08)}button:active:not(:disabled){transform:scale(.98)}
+.btn.ghost,label.btn.ghost{background:var(--card);color:var(--tx);border:1px solid var(--bd)}
+.logo{display:flex;align-items:center;gap:10px}.logo .lg{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--ac),var(--scn))}
+#th{padding:10px;border-radius:50%}
+.hero h1{background:linear-gradient(90deg,var(--ac),var(--scn) 55%,var(--pdf));-webkit-background-clip:text;background-clip:text;color:transparent}
+.chip{display:inline-flex;gap:6px;align-items:center;border-radius:999px}
+.card{border-left:1px solid var(--bd);border-radius:20px;padding:18px;position:relative;overflow:hidden;box-shadow:0 1px 2px #0001}
+.card::after{content:'';position:absolute;inset:0 0 auto 0;height:3px;background:var(--c)}
+.card:hover{box-shadow:0 16px 30px -14px var(--c)}
+.card i{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent);margin-bottom:10px}
+.card b{font-size:16px}.card.new::before{content:'NEW';position:absolute;right:12px;top:14px;font:700 10px 'DM Sans';background:var(--c);color:#fff;border-radius:99px;padding:2px 8px}
+#tool h2{display:flex;align-items:center;gap:10px;font-size:28px}#tool h2 .ic{color:var(--ac)}
+.panel{border-radius:20px;box-shadow:0 1px 2px #0001}.row{border-radius:14px}
+.drop{border-radius:22px;background:linear-gradient(180deg,var(--card),var(--in))}
+.drop .ar{display:grid;place-items:center;width:60px;height:60px;margin:0 auto 8px;border-radius:50%;color:var(--ac);background:color-mix(in srgb,var(--ac) 14%,transparent)}
+.sbt,.seg{display:flex;gap:8px;flex-wrap:wrap}.seg{justify-content:center;margin:10px 0}
+.sbt .btn,.sbt button{flex:1;min-width:140px;cursor:pointer;white-space:nowrap}.sbt button:first-child{flex-basis:100%;padding:14px;font-size:17px;background:linear-gradient(135deg,var(--scn),var(--ac))}
+#sc{max-width:100%;height:auto;border-radius:12px;touch-action:none;background:repeating-conic-gradient(var(--in) 0 25%,var(--card) 0 50%) 0 0/20px 20px;box-shadow:0 8px 24px -12px #0006}
+.scn{display:grid;grid-template-columns:minmax(240px,340px) 1fr;gap:20px;align-items:start}@media(max-width:760px){.scn{grid-template-columns:1fr}}
+.sl{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:8px 0}
+.cam{position:fixed;inset:0;z-index:50;background:#000;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.camb{flex:1;min-height:0;display:grid;place-items:center;padding:8px}.vw{position:relative;display:flex;max-width:100%;max-height:100%}
+.vw video{max-width:100%;max-height:calc(100vh - 170px);border-radius:12px}.vw .ov{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.camc{display:flex;gap:10px;padding:12px;background:#111;flex-wrap:wrap;align-items:center;justify-content:center}.camc .big{width:auto;flex:1;max-width:260px}.camc label{color:#fff;display:flex;gap:6px;align-items:center}
+.cell.on{box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 35%,transparent)}
+[hidden]{display:none!important}
+.rsv{position:relative;margin:12px 0;border-radius:16px;overflow:hidden;background:#000}.rsv video{width:100%;display:block;max-height:60vh;object-fit:cover}.rsf{position:absolute;inset:14%;border:3px solid #fff;border-radius:18px;box-shadow:0 0 0 999px #0006;pointer-events:none}
+.tag{display:inline-block;font:700 12px 'DM Sans',sans-serif;color:var(--scn);background:color-mix(in srgb,var(--scn) 16%,transparent);border-radius:99px;padding:3px 10px}
+.rtx{background:var(--in);border:1px solid var(--bd);border-radius:12px;padding:12px;margin:10px 0;font:14px/1.5 ui-monospace,Menlo,Consolas,monospace;word-break:break-all;white-space:pre-wrap;max-height:220px;overflow:auto}
+.ii{width:92px;display:inline-block;padding:6px 8px}.pr{padding:10px 0;border-bottom:1px solid var(--bd);line-height:2.4}.pr:last-child{border:0}
+</style></head><body><div class="w">
+<header><div class="logo" onclick="location.hash=''"><span class="lg"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10"/></svg></span><div>PDF<span>Studio</span></div></div><button class="ghost" id="th" aria-label="Toggle dark mode"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg></button></header>
+<main id="home"><div class="hero"><h1>Every PDF and photo tool, in one tab.</h1><p>Scan documents and QR codes with your camera, then merge, split, compress, crop and resize files. Plus everyday tools like calculators, converters and a timer. Everything runs on your device, so your files are never uploaded.</p></div>
+<div class="bar"><input id="q" type="search" placeholder="Search tools (merge, resize, qr…)" aria-label="Search tools"><button class="chip on" data-c="all">All</button><button class="chip" data-c="scan">Scan</button><button class="chip" data-c="pdf">PDF</button><button class="chip" data-c="img">Photo</button><button class="chip" data-c="hdy">Handy</button></div>
+<div class="grid" id="grid"></div></main>
+<section id="tool" hidden></section>
+<footer>Files stay in your browser. Nothing is sent to a server.</footer></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script>
+const $=s=>document.querySelector(s),L=PDFLib,P=pdfjsLib;
+try{P.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'}catch(e){}
+try{qrcode.stringToBytes=qrcode.stringToBytesFuncs['UTF-8']}catch(e){}
+let files=[],cur,cat='all';
+const IC={scan:'<path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10"/>',camera:'<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3"/>',upload:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>',download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',crop:'<path d="M6 2v14a2 2 0 0 0 2 2h14M18 22V8a2 2 0 0 0-2-2H2"/>',merge:'<path d="M12 2 2 7l10 5 10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>',split:'<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/>',rotate:'<path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/>',pnum:'<path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/>',wm:'<path d="M12 22a7 7 0 0 0 7-7c0-4-7-13-7-13S5 11 5 15a7 7 0 0 0 7 7z"/>',compress:'<path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/>',p2i:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/>',i2p:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M12 18v-6M9 15h6"/>',resize:'<path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/>',qr:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M14 21h3M21 14v3M21 21v0"/>',pass:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',count:'<path d="M4 7V4h16v3M9 20h6M12 4v16"/>',file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6"/>',image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/>',spark:'<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>',up:'<path d="M12 19V5M5 12l7-7 7 7"/>',down:'<path d="M12 5v14M19 12l-7 7-7-7"/>',x:'<path d="M18 6 6 18M6 6l12 12"/>',eye:'<path d="M2 12s4-8 10-8 10 8 10 8-4 8-10 8S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',trash:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>',full:'<rect x="4" y="4" width="16" height="16" rx="1"/>',wand:'<path d="M15 4V2M15 16v-2M8 9h2M20 9h2M17.8 11.8 19 13M15 9h.01M17.8 6.2 19 5M3 21l9-9M12.2 6.2 11 5"/>',left:'<path d="M19 12H5M12 19l-7-7 7-7"/>'};
+const ic=(n,s=20)=>`<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]||IC.file}</svg>`;
+
+const sz=b=>b<1024?b+' B':b<1048576?(b/1024).toFixed(1)+' KB':(b/1048576).toFixed(2)+' MB';
+const o=id=>id=='kb'&&$('#o_ku')?(+$('#o_kb').value||0)*($('#o_ku').value=='MB'?1024:1):$('#o_'+id).value,esc=s=>String(s).replace(/[&<>"]/g,c=>'&#'+c.charCodeAt(0)+';');
+const ld=async f=>L.PDFDocument.load(await f.arrayBuffer(),{ignoreEncryption:true});
+const blobOf=(c,t,q)=>new Promise(r=>c.toBlob(r,t,q)),pdfB=b=>new Blob([b],{type:'application/pdf'});
+const st=(m,e)=>{$('#st').textContent=m;$('#st').className=e?'er':''};
+const base=f=>f.name.replace(/\.[^.]+$/,'');
+function range(s,n){s=(s||'').replace(/\s/g,'');if(!s)return[...Array(n).keys()];const r=[];
+ for(const p of s.split(',')){const m=p.match(/^(\d*)-?(\d*)$/);if(!m||!p)continue;let a=m[1],b=p.includes('-')?m[2]:a;a=a?+a:1;b=b?+b:n;if(a>b)[a,b]=[b,a];for(let i=Math.max(a,1);i<=Math.min(b,n);i++)r.push(i-1)}
+ if(!r.length)throw Error('No valid pages in "'+s+'". This file has '+n+' pages.');return r}
+function out(b,name){const u=URL.createObjectURL(b),d=document.createElement('div');d.className='row';
+ d.innerHTML=(b.type.startsWith('image/')?`<img src="${u}" alt="">`:'<span>'+ic('file',28)+'</span>')+`<div><b>${esc(name)}</b><small>${sz(b.size)}</small></div><a class="btn" href="${u}" download="${esc(name)}">${ic('download',16)} Download</a>`;$('#out').append(d)}
+async function zip(e,name){const z=new JSZip();e.forEach(x=>z.file(x.n,x.b));out(await z.generateAsync({type:'blob'}),name)}
+async function cv(f,t,q,w,h){const b=f instanceof ImageBitmap?f:await createImageBitmap(f);w=w||b.width;h=h||b.height;const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');
+ if(t=='image/jpeg'){x.fillStyle='#fff';x.fillRect(0,0,w,h)}x.imageSmoothingQuality='high';x.drawImage(b,0,0,w,h);return blobOf(c,t,q)}
+async function pages(f,sc,fn,pr){const pd=await P.getDocument({data:await f.arrayBuffer()}).promise;
+ for(const i of range(pr,pd.numPages)){st(`Rendering page ${i+1} of ${pd.numPages}…`);const pg=await pd.getPage(i+1),v=pg.getViewport({scale:sc}),c=document.createElement('canvas');c.width=v.width;c.height=v.height;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);await pg.render({canvasContext:x,viewport:v}).promise;await fn(c,i,pg)}}
+const sel=(id,l,opts)=>`<div class="f"><label>${l}</label><select id="o_${id}">${opts.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('')}</select></div>`;
+const inp=(id,l,v='',t='text',x='')=>`<div class="f"><label>${l}</label><input id="o_${id}" type="${t}" value="${v}" ${x}></div>`;
+const PR=inp('pages','Pages (like 1-3,5,8-)','','text','placeholder="all pages"'),mk=(n,b,s)=>pdfB(b);
+const T=[
+{id:'merge',c:'pdf',i:'🧩',n:'Merge PDF',d:'Combine several PDFs into one. Reorder with the arrows.',acc:'.pdf',multi:1,min:2,async run(){const d=await L.PDFDocument.create();for(const f of files){const s=await ld(f);(await d.copyPages(s,s.getPageIndices())).forEach(p=>d.addPage(p))}out(pdfB(await d.save()),'merged.pdf')}},
+{id:'split',c:'pdf',i:'✂️',n:'Split & Remove Pages',d:'Extract pages, delete pages, or split into single pages.',acc:'.pdf',opts:sel('mode','What to do',[['keep','Keep these pages'],['remove','Remove these pages'],['each','Split every page into its own file']])+PR,async run(){const s=await ld(files[0]),n=s.getPageCount(),m=o('mode'),b=base(files[0]);
+ if(m=='each'){const e=[];for(let i=0;i<n;i++){const d=await L.PDFDocument.create();d.addPage((await d.copyPages(s,[i]))[0]);e.push({n:`${b}-page${i+1}.pdf`,b:await d.save()})}return zip(e,b+'-pages.zip')}
+ let ix=range(o('pages'),n);if(m=='remove'){const r=ix;ix=s.getPageIndices().filter(i=>!r.includes(i));if(!ix.length)throw Error('That would remove every page.')}
+ const d=await L.PDFDocument.create();(await d.copyPages(s,ix)).forEach(p=>d.addPage(p));out(pdfB(await d.save()),b+'-edited.pdf')}},
+{id:'rotate',c:'pdf',i:'🔄',n:'Rotate PDF',d:'Turn all pages or chosen pages.',acc:'.pdf',opts:sel('angle','Rotate',[[90,'90° right'],[180,'180°'],[270,'90° left']])+PR,async run(){const s=await ld(files[0]);range(o('pages'),s.getPageCount()).forEach(i=>{const p=s.getPage(i);p.setRotation(L.degrees((p.getRotation().angle+ +o('angle'))%360))});out(pdfB(await s.save()),base(files[0])+'-rotated.pdf')}},
+{id:'pnum',c:'pdf',i:'🔢',n:'Page Numbers',d:'Add page numbers to every page.',acc:'.pdf',opts:sel('pos','Position',[['c','Bottom center'],['r','Bottom right'],['l','Bottom left']])+sel('fmt','Format',[['n','1, 2, 3'],['of','Page 1 of 10']])+inp('start','Start at',1,'number')+inp('size','Font size',11,'number'),async run(){const s=await ld(files[0]),F=await s.embedFont(L.StandardFonts.Helvetica),n=s.getPageCount(),fs=+o('size')||11,a=+o('start')||1;
+ s.getPages().forEach((p,i)=>{const w=p.getSize().width,t=o('fmt')=='of'?`Page ${a+i} of ${n}`:String(a+i),tw=F.widthOfTextAtSize(t,fs);p.drawText(t,{x:o('pos')=='l'?36:o('pos')=='r'?w-36-tw:(w-tw)/2,y:24,size:fs,font:F,color:L.rgb(.2,.2,.2)})});out(pdfB(await s.save()),base(files[0])+'-numbered.pdf')}},
+{id:'wm',c:'pdf',i:'💧',n:'Watermark',d:'Stamp text across every page. Works with any language.',acc:'.pdf',opts:inp('text','Text','CONFIDENTIAL')+inp('size','Size',60,'number')+inp('color','Color','#ff0000','color')+inp('op','Opacity %',30,'range','min=5 max=100')+inp('rot','Angle',45,'number'),async run(){const s=await ld(files[0]),k=2,sz=+o('size'),f=`bold ${sz*k}px sans-serif`,c=document.createElement('canvas'),x=c.getContext('2d');
+ x.font=f;c.width=x.measureText(o('text')).width+20;c.height=sz*k*1.5;x.font=f;x.fillStyle=o('color');x.textBaseline='middle';x.fillText(o('text'),10,c.height/2);
+ const im=await s.embedPng(await(await blobOf(c)).arrayBuffer()),w=c.width/k,h=c.height/k,t=o('rot')*Math.PI/180;
+ s.getPages().forEach(p=>{const g=p.getSize();p.drawImage(im,{x:g.width/2-w/2*Math.cos(t)+h/2*Math.sin(t),y:g.height/2-w/2*Math.sin(t)-h/2*Math.cos(t),width:w,height:h,rotate:L.degrees(+o('rot')),opacity:o('op')/100})});out(pdfB(await s.save()),base(files[0])+'-watermarked.pdf')}},
+{id:'compress',c:'pdf',i:'🗜️',n:'Compress PDF',d:'Shrink big scans and photo PDFs. Pages become images, so text is no longer selectable.',acc:'.pdf',opts:sel('lvl','Compression',[['1.2,.5','Strong (smallest file)'],['1.6,.7','Balanced'],['2,.85','Light (best quality)']]),async run(){const[sc,q]=o('lvl').split(',').map(Number),d=await L.PDFDocument.create();
+ await pages(files[0],sc,async(c,i,pg)=>{const im=await d.embedJpg(await(await blobOf(c,'image/jpeg',q)).arrayBuffer()),v=pg.getViewport({scale:1});d.addPage([v.width,v.height]).drawImage(im,{x:0,y:0,width:v.width,height:v.height})});
+ const b=pdfB(await d.save()),r=Math.round((1-b.size/files[0].size)*100);out(b,base(files[0])+'-compressed.pdf');st(r>0?`Smaller by ${r}%: ${sz(files[0].size)} → ${sz(b.size)}`:'This file was already small. Try a different level or keep the original.')}},
+{id:'p2i',c:'pdf',i:'🖼️',n:'PDF to Images',d:'Save every page as a JPG or PNG.',acc:'.pdf',opts:sel('fmt','Format',[['image/jpeg','JPG'],['image/png','PNG']])+sel('scale','Quality',[[1.5,'Good'],[2,'High'],[3,'Very high']])+PR,async run(){const e=[],t=o('fmt'),b=base(files[0]);
+ await pages(files[0],+o('scale'),async(c,i)=>e.push({n:`${b}-${i+1}.${t=='image/png'?'png':'jpg'}`,b:await blobOf(c,t,.92)}),o('pages'));e.length==1?out(e[0].b,e[0].n):await zip(e,b+'-images.zip')}},
+{id:'i2p',c:'pdf',i:'📑',n:'Images to PDF',d:'Turn photos into one PDF. Reorder with the arrows.',acc:'image/*',multi:1,opts:sel('page','Page size',[['a4','A4'],['letter','US Letter'],['orig','Same as image']])+inp('mg','Margin (pt)',20,'number'),async run(){const d=await L.PDFDocument.create(),mg=+o('mg')||0;
+ for(const f of files){const im=await d.embedJpg(await(await cv(f,'image/jpeg',.92)).arrayBuffer()),W=im.width,H=im.height;if(o('page')=='orig'){d.addPage([W,H]).drawImage(im,{x:0,y:0,width:W,height:H});continue}
+ let[pw,ph]=o('page')=='a4'?[595.28,841.89]:[612,792];if(W>H)[pw,ph]=[ph,pw];const r=Math.min((pw-2*mg)/W,(ph-2*mg)/H);d.addPage([pw,ph]).drawImage(im,{x:(pw-W*r)/2,y:(ph-H*r)/2,width:W*r,height:H*r})}out(pdfB(await d.save()),'images.pdf')}},
+{id:'resize',c:'img',i:'📐',n:'Photo Resizer',d:'Resize, compress and convert photos. Set an exact size or a maximum file size in KB.',acc:'image/*',multi:1,
+ opts:sel('pre','Preset',[['','Custom'],['413,531','Passport photo 35×45 mm'],['300,300','Small square 300×300'],['1080,1080','Square 1080×1080'],['1280,720','HD 1280×720'],['1920,1080','Full HD 1920×1080']]).replace('<select','<select onchange="const v=this.value.split(\',\');if(v[0]){$(\'#o_mode\').value=\'px\';$(\'#o_w\').value=v[0];$(\'#o_h\').value=v[1];$(\'#o_fit\').value=0}"')+sel('mode','Resize by',[['px','Pixels'],['pct','Percent']])+inp('w','Width (px)','','number','placeholder="auto"')+inp('h','Height (px)','','number','placeholder="auto"')+inp('pct','Percent',50,'number')+sel('fit','If both sizes are set',[[1,'Keep proportions (fit inside)'],[0,'Stretch to exact size']])+sel('fmt','Format',[['orig','Keep original'],['image/jpeg','JPG'],['image/png','PNG'],['image/webp','WebP']])+inp('q','Quality %',85,'range','min=10 max=100')+inp('kb','Max file size (KB, optional)','','number','placeholder="no limit"'),
+ async run(){for(const f of files){const bm=await createImageBitmap(f),ar=bm.width/bm.height;let w=+o('w'),h=+o('h');
+ if(o('mode')=='pct'){w=Math.round(bm.width*o('pct')/100);h=Math.round(bm.height*o('pct')/100)}else if(w&&!h)h=Math.round(w/ar);else if(h&&!w)w=Math.round(h*ar);else if(!w&&!h){w=bm.width;h=bm.height}else if(o('fit')==1){const r=Math.min(w/bm.width,h/bm.height);w=Math.round(bm.width*r);h=Math.round(bm.height*r)}
+ let t=o('fmt');if(t=='orig')t=['image/jpeg','image/png','image/webp'].includes(f.type)?f.type:'image/jpeg';const kb=+o('kb');let b=await cv(bm,t,o('q')/100,w,h);
+ if(kb&&t!='image/png'){let lo=.05,hi=.95;b=await cv(bm,t,lo,w,h);for(let i=0;i<7;i++){const m=(lo+hi)/2,x=await cv(bm,t,m,w,h);if(x.size<=kb*1024){b=x;lo=m}else hi=m}if(b.size>kb*1024)st('Could not reach '+kb+' KB at this size. Try smaller dimensions.',1)}
+ out(b,`${base(f)}-${w}x${h}.${t.split('/')[1].replace('jpeg','jpg')}`)}}},
+{id:'qr',c:'img',i:'▦',n:'QR Code Maker',d:'Custom colors, dot styles and your own logo. Download as PNG or SVG.',custom:qrUI},
+{id:'pass',c:'hdy',i:'🔐',n:'Password Generator',d:'Strong random passwords, made on your device.',custom:passUI},
+{id:'count',c:'hdy',i:'📝',n:'Word Counter',d:'Words, characters, sentences and reading time.',custom:countUI}];
+const CC={pdf:'var(--pdf)',img:'var(--img)',hdy:'var(--hdy)'};
+function grid(){const q=$('#q').value.toLowerCase();$('#grid').innerHTML=T.filter(t=>(cat=='all'||t.c==cat)&&(t.n+t.d).toLowerCase().includes(q)).map(t=>`<a class="card${t.id=='scan'||t.nw?' new':''}" style="--c:${CC[t.c]}" href="#${t.id}"><i>${t.i}</i><b>${t.n}</b><small>${t.d}</small></a>`).join('')||'<p class="mut">No tool matches that search.</p>'}
+$('#q').oninput=grid;document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{cat=b.dataset.c;document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x==b));grid()});
+$('#th').onclick=()=>{const r=document.documentElement,d=getComputedStyle(r).colorScheme.includes('dark')||r.dataset.theme=='dark';r.dataset.theme=d?'light':'dark'};
+function route(){const t=T.find(x=>x.id==location.hash.slice(1));cur=t;files=[];$('#home').hidden=!!t;$('#tool').hidden=!t;scrollTo(0,0);if(t)open(t)}
+function open(t){$('#tool').innerHTML=`<button class="back" onclick="location.hash=''">${ic('left',16)} All tools</button><h2>${t.i} ${t.n}</h2><p class="mut">${t.d}</p><div id="body"></div>`;const b=$('#body');if(t.custom)return t.custom(b);
+ b.innerHTML=`<label class="drop" id="dz"><input type="file" hidden id="fi" ${t.multi?'multiple':''} accept="${t.acc=='.pdf'?'.pdf,application/pdf':t.acc}"><div class="ar">${ic('upload',28)}</div><b>Choose ${t.multi?'files':'a file'}</b> or drop ${t.multi?'them':'it'} here</label><div id="fl"></div><div class="opts">${t.opts||''}</div><button class="big" id="go" disabled>${t.n}</button><div id="st" role="status"></div><div id="out"></div>`;
+ const add=l=>{const a=[...l].filter(f=>t.acc=='.pdf'?/\.pdf$/i.test(f.name):f.type.startsWith('image/'));if(!a.length)return st('That file type is not supported here.',1);files=t.multi?files.concat(a):[a[0]];st('');list()};
+ $('#fi').onchange=e=>{add(e.target.files);e.target.value=''};const dz=$('#dz');dz.ondragover=e=>{e.preventDefault();dz.classList.add('on')};dz.ondragleave=()=>dz.classList.remove('on');dz.ondrop=e=>{e.preventDefault();dz.classList.remove('on');add(e.dataTransfer.files)};
+ $('#go').onclick=async()=>{$('#go').disabled=true;$('#out').innerHTML='';st('Working…');try{await t.run();if($('#st').textContent=='Working…')st('Done. Your file is ready below.')}catch(e){st('Something went wrong: '+(e.message||e)+'. If the PDF is password-protected, unlock it first.',1)}list()}}
+function list(){const t=cur;$('#fl').innerHTML='';files.forEach((f,i)=>{const d=document.createElement('div');d.className='row';d.innerHTML=`<span>${ic(t.acc=='.pdf'?'file':'image',22)}</span><div><b>${esc(f.name)}</b><small>${sz(f.size)}</small></div>`+(t.multi?'<button class="ghost" aria-label="Move up">'+ic('up',16)+'</button><button class="ghost" aria-label="Move down">'+ic('down',16)+'</button>':'')+'<button class="ghost" aria-label="Remove">'+ic('x',16)+'</button>';
+ const bs=d.querySelectorAll('button'),mv=k=>{const j=i+k;if(j<0||j>=files.length)return;[files[i],files[j]]=[files[j],files[i]];list()};if(t.multi){bs[0].onclick=()=>mv(-1);bs[1].onclick=()=>mv(1)}bs[bs.length-1].onclick=()=>{files.splice(i,1);list()};$('#fl').append(d)});$('#go').disabled=files.length<(t.min||1)}
+function dlb(b,n){const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n;a.click()}
+function qrUI(el){let logo=null,svg='';
+ el.innerHTML=`<div class="two"><div class="panel"><div class="opts" style="margin-top:0"><div class="f" style="grid-column:1/-1"><label>Type</label><select id="qt"><option value="t">Text or link</option><option value="w">Wi-Fi</option><option value="e">Email</option><option value="p">Phone</option></select></div><div id="qin" style="grid-column:1/-1;display:grid;gap:10px"></div>
+ <div class="f"><label>Dot color</label><input type="color" id="qf" value="#0f172a"></div><div class="f"><label>Background</label><input type="color" id="qb" value="#ffffff"></div>
+ <div class="f"><label>Dot style</label><select id="qd"><option value="s">Square</option><option value="r">Rounded</option><option value="c">Circles</option></select></div><div class="f"><label>Error correction</label><select id="qe"><option>L</option><option selected>M</option><option>Q</option><option>H</option></select></div>
+ <div class="f"><label>Size</label><input type="range" id="qs" min="240" max="1000" value="512"></div><div class="f"><label>Margin</label><input type="range" id="qm" min="0" max="8" value="2"></div>
+ <div class="f" style="grid-column:1/-1"><label>Logo in the center (optional)</label><input type="file" id="ql" accept="image/*"></div></div></div>
+ <div class="panel ctr"><canvas id="qc" width="512" height="512"></canvas><p class="mut" id="qh"></p><button id="qp">Download PNG</button> <button id="qv" class="ghost">Download SVG</button></div></div>`;
+ const F={t:[['Text or link','textarea','https://example.com']],w:[['Network name'],['Password'],['Security','select']],e:[['To (email)'],['Subject'],['Message','textarea']],p:[['Phone number']]};
+ const fields=()=>{const k=$('#qt').value;$('#qin').innerHTML=F[k].map((f,i)=>f[1]=='select'?`<select id="q${i}"><option value="WPA">WPA/WPA2</option><option value="WEP">WEP</option><option value="nopass">No password</option></select>`:f[1]=='textarea'?`<textarea id="q${i}" rows="3" placeholder="${f[0]}">${f[2]||''}</textarea>`:`<input id="q${i}" placeholder="${f[0]}">`).join('');document.querySelectorAll('#qin>*').forEach(x=>x.oninput=draw);draw()};
+ const v=i=>($('#q'+i)||{}).value||'',e2=s=>s.replace(/([\\;,:"])/g,'\\$1');
+ function draw(){const k=$('#qt').value,data=k=='t'?v(0):k=='w'?`WIFI:T:${v(2)};S:${e2(v(0))};P:${e2(v(1))};;`:k=='e'?`mailto:${v(0)}?subject=${encodeURIComponent(v(1))}&body=${encodeURIComponent(v(2))}`:'tel:'+v(0);
+  const S=+$('#qs').value,m=+$('#qm').value,fg=$('#qf').value,bg=$('#qb').value,sty=$('#qd').value,q=qrcode(0,logo?'H':$('#qe').value);q.addData(data.trim()?data:' ');q.make();const n=q.getModuleCount(),u=S/(n+2*m),c=$('#qc'),x=c.getContext('2d');
+  c.width=c.height=S;x.fillStyle=bg;x.fillRect(0,0,S,S);x.fillStyle=fg;let s=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n+2*m} ${n+2*m}" width="${S}" height="${S}"><rect width="100%" height="100%" fill="${bg}"/><g fill="${fg}">`;
+  for(let r=0;r<n;r++)for(let j=0;j<n;j++)if(q.isDark(r,j)){const X=(j+m)*u,Y=(r+m)*u;x.beginPath();if(sty=='s'){x.rect(X,Y,u+.5,u+.5);s+=`<rect x="${j+m}" y="${r+m}" width="1.02" height="1.02"/>`}else if(sty=='r'){x.roundRect(X,Y,u,u,u*.35);s+=`<rect x="${j+m}" y="${r+m}" width="1" height="1" rx=".35"/>`}else{x.arc(X+u/2,Y+u/2,u*.46,0,7);s+=`<circle cx="${j+m+.5}" cy="${r+m+.5}" r=".46"/>`}x.fill()}
+  s+='</g>';if(logo){const L2=S*.22,p=(S-L2)/2,ul=(n+2*m)*.22,pu=((n+2*m)-ul)/2;x.fillStyle=bg;x.fillRect(p-6,p-6,L2+12,L2+12);x.drawImage(logo,p,p,L2,L2);const lc=document.createElement('canvas');lc.width=lc.height=200;lc.getContext('2d').drawImage(logo,0,0,200,200);s+=`<rect x="${pu-.3}" y="${pu-.3}" width="${ul+.6}" height="${ul+.6}" fill="${bg}"/><image href="${lc.toDataURL()}" x="${pu}" y="${pu}" width="${ul}" height="${ul}"/>`}
+  svg=s+'</svg>';$('#qh').textContent=data.trim()?(logo?'Logo added. Error correction set to High so it still scans.':'Scan with your phone camera to test.'):'Type something to build your code.'}
+ document.querySelectorAll('.panel input,.panel select').forEach(x=>{if(x.id!='ql'&&x.id!='qt')x.oninput=draw});$('#qt').onchange=fields;
+ $('#ql').onchange=async e=>{logo=e.target.files[0]?await createImageBitmap(e.target.files[0]):null;draw()};
+ $('#qp').onclick=async()=>dlb(await blobOf($('#qc')),'qr-code.png');$('#qv').onclick=()=>dlb(new Blob([svg],{type:'image/svg+xml'}),'qr-code.svg');fields()}
+function passUI(el){el.innerHTML=`<div class="panel"><div class="opts" style="margin-top:0"><div class="f"><label>Length: <span id="pl">16</span></label><input type="range" id="plen" min="6" max="64" value="16"></div><div class="f"><label><input type="checkbox" id="pu" checked> A–Z</label><label><input type="checkbox" id="pw" checked> a–z</label><label><input type="checkbox" id="pd" checked> 0–9</label><label><input type="checkbox" id="ps" checked> Symbols</label></div></div>
+ <div class="row"><code id="pv" style="font-size:20px"></code><button id="pc">Copy</button></div><p class="mut" id="pm"></p><button class="big" id="pg">Generate new password</button></div>`;
+ const g=()=>{const S=[['pu','ABCDEFGHJKLMNPQRSTUVWXYZ'],['pw','abcdefghijkmnopqrstuvwxyz'],['pd','23456789'],['ps','!@#$%^&*-_+=?']],pool=S.filter(s=>$('#'+s[0]).checked).map(s=>s[1]).join('')||'abcdefghijkmnopqrstuvwxyz',n=+$('#plen').value,a=crypto.getRandomValues(new Uint32Array(n));
+  $('#pl').textContent=n;$('#pv').textContent=[...a].map(v=>pool[v%pool.length]).join('');const bits=n*Math.log2(pool.length);$('#pm').textContent=bits>100?'Very strong':bits>70?'Strong':bits>45?'Fair. Make it longer.':'Weak. Make it longer.'};
+ el.querySelectorAll('input').forEach(i=>i.oninput=g);$('#pg').onclick=g;$('#pc').onclick=async()=>{await navigator.clipboard.writeText($('#pv').textContent).catch(()=>{});$('#pc').textContent='Copied';setTimeout(()=>$('#pc').textContent='Copy',1200)};g()}
+function countUI(el){el.innerHTML=`<div class="panel"><textarea id="ct" rows="10" placeholder="Type or paste your text here"></textarea><div class="stats" id="cs"></div></div>`;
+ const g=()=>{const t=$('#ct').value,w=(t.match(/\S+/g)||[]).length,S=[['Words',w],['Characters',t.length],['No spaces',t.replace(/\s/g,'').length],['Sentences',(t.match(/[^.!?।]+[.!?।]+/g)||[]).length],['Paragraphs',t.split(/\n\s*\n/).filter(x=>x.trim()).length],['Reading time',Math.max(w?1:0,Math.ceil(w/200))+' min']];$('#cs').innerHTML=S.map(s=>`<div><b>${s[1]}</b><small>${s[0]}</small></div>`).join('')};
+ $('#ct').oninput=g;g()}
+onhashchange=route;grid();
+</script><script>
+const PD=new WeakMap(),PV={split:G,rotate:G,p2i:G,compress:G,pnum:OV,wm:OV,resize:RZ,merge:MG};let pvT,pvId=0;
+const pdoc=f=>{if(!PD.has(f))PD.set(f,f.arrayBuffer().then(b=>P.getDocument({data:new Uint8Array(b)}).promise));return PD.get(f)};
+async function rp(pd,i,w){const pg=await pd.getPage(i),v0=pg.getViewport({scale:1}),v=pg.getViewport({scale:w/v0.width}),c=document.createElement('canvas');c.width=v.width;c.height=v.height;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);await pg.render({canvasContext:x,viewport:v}).promise;c.pt=v0.width;return c}
+function pv(){clearTimeout(pvT);pvT=setTimeout(async()=>{const box=$('#pv'),fn=cur&&PV[cur.id];if(!box||!fn)return;const id=++pvId;if(!files.length){box.hidden=true;box.f=null;box.b=null;return}box.hidden=false;try{await fn(box,id)}catch(e){box.innerHTML='<small class="mut">Preview is not available for this file.</small>';box.f=null;box.b=null}},250)}
+function selSet(n){const e=$('#o_pages'),v=e?e.value.trim():'';if(!v)return new Set(cur.id=='split'&&o('mode')=='remove'?[]:[...Array(n).keys()]);try{return new Set(range(v,n))}catch(x){return new Set()}}
+function toR(S,n,rm){const a=[...S].sort((x,y)=>x-y);if(!a.length)return rm?'':'none';if(a.length==n)return rm?'1-'+n:'';const r=[];let s=a[0],p=s;for(const v of a.slice(1).concat(-9)){if(v==p+1){p=v;continue}r.push(s==p?s+1:`${s+1}-${p+1}`);s=p=v}return r.join(',')}
+function tog(i){const box=$('#pv'),e=$('#o_pages');if(!e||cur.id=='compress')return;const n=box.n,S=selSet(n);S.has(i)?S.delete(i):S.add(i);e.value=toR(S,n,cur.id=='split'&&o('mode')=='remove');e.dispatchEvent(new Event('input',{bubbles:true}))}
+function mark(box){const g=box.querySelector('.pg'),S=selSet(box.n),id=cur.id,m=$('#o_mode')&&o('mode'),a=$('#o_angle')&&+o('angle');
+ [...g.children].forEach((d,i)=>{const s=S.has(i);d.className='cell'+(id=='split'?(m=='keep'?(s?' on':' off'):m=='remove'&&s?' rm':''):id=='rotate'?(s?' on':''):id=='p2i'?(s?' on':' off'):'');d.firstChild.style.transform=id=='rotate'&&s?`rotate(${a}deg) scale(${a==180?1:.72})`:''})}
+async function G(box){const f=files[0];if(box.f!==f){box.f=f;const pd=await pdoc(f),n=box.n=pd.numPages,c=Math.min(n,80);box.innerHTML=`<p class="mut" style="margin:0 0 8px">${cur.id=='compress'?'Pages in this PDF':'Click pages to select them'}${n>c?` (first ${c} of ${n} shown)`:''}</p><div class="pg"></div>`;const g=box.querySelector('.pg');
+ for(let i=0;i<c;i++){const d=document.createElement('div');d.innerHTML=`<img alt="Page ${i+1}"><span>${i+1}</span>`;d.onclick=()=>tog(i);g.append(d)}
+ (async()=>{for(let i=0;i<c;i++){if(box.f!==f)return;g.children[i].firstChild.src=(await rp(pd,i+1,140)).toDataURL('image/jpeg',.7)}})()}
+ if(box.n)mark(box)}
+async function OV(box){const f=files[0];if(box.f!==f||!box.b){box.f=f;box.b=null;const pd=await pdoc(f);box.n=pd.numPages;box.b=await rp(pd,1,360);box.innerHTML='<canvas></canvas><p class="mut" style="margin:8px 0 0">Live preview of page 1</p>'}
+ const b=box.b,c=box.querySelector('canvas'),k=b.width/b.pt;c.width=b.width;c.height=b.height;const x=c.getContext('2d');x.drawImage(b,0,0);
+ if(cur.id=='wm'){x.save();x.globalAlpha=o('op')/100;x.translate(c.width/2,c.height/2);x.rotate(-o('rot')*Math.PI/180);x.font=`bold ${+o('size')*k}px sans-serif`;x.fillStyle=o('color');x.textAlign='center';x.textBaseline='middle';x.fillText(o('text'),0,0);x.restore()}
+ else{const fs=(+o('size')||11)*k,t=o('fmt')=='of'?`Page ${+o('start')||1} of ${box.n}`:String(+o('start')||1);x.font=`${fs}px Helvetica,Arial,sans-serif`;x.fillStyle='#333';const w=x.measureText(t).width;x.fillText(t,o('pos')=='l'?36*k:o('pos')=='r'?c.width-36*k-w:(c.width-w)/2,c.height-24*k)}}
+async function encode(f,bm){bm=bm||await createImageBitmap(f);const ar=bm.width/bm.height;let w=+o('w'),h=+o('h');
+ if(o('mode')=='pct'){w=Math.round(bm.width*o('pct')/100);h=Math.round(bm.height*o('pct')/100)}else if(w&&!h)h=Math.round(w/ar);else if(h&&!w)w=Math.round(h*ar);else if(!w&&!h){w=bm.width;h=bm.height}else if(o('fit')==1){const r=Math.min(w/bm.width,h/bm.height);w=Math.round(bm.width*r);h=Math.round(bm.height*r)}
+ w=Math.max(1,w);h=Math.max(1,h);let t=o('fmt');if(t=='orig')t=['image/jpeg','image/png','image/webp'].includes(f.type)?f.type:'image/jpeg';const kb=+o('kb');let b=await cv(bm,t,o('q')/100,w,h);
+ if(kb&&t!='image/png'){let lo=.05,hi=.95;b=await cv(bm,t,lo,w,h);for(let i=0;i<7;i++){const m=(lo+hi)/2,x=await cv(bm,t,m,w,h);if(x.size<=kb*1024){b=x;lo=m}else hi=m}st(b.size>kb*1024?'Cannot reach '+kb+' KB at this size. Try smaller dimensions.':'',b.size>kb*1024)}
+ return{b,w,h,n:`${base(f)}-${w}x${h}.${t.split('/')[1].replace('jpeg','jpg')}`}}
+T.find(t=>t.id=='resize').run=async()=>{const e=[];for(const f of files){const r=await encode(f);e.push({n:r.n,b:r.b});out(r.b,r.n)}if(e.length>1)await zip(e,'resized-photos.zip')};
+async function RZ(box,id){const f=files[0],bm=await createImageBitmap(f),r=await encode(f,bm);if(id!=pvId)return;const d=Math.round((1-r.b.size/f.size)*100);
+ box.innerHTML=`<div class="cmp"><div><small>Original</small><img alt="Original" src="${f.u||(f.u=URL.createObjectURL(f))}"><b>${bm.width}×${bm.height} · ${sz(f.size)}</b></div><div><small>After (live preview${files.length>1?', first photo':''})</small><img alt="Result" src="${URL.createObjectURL(r.b)}"><b>${r.w}×${r.h} · ${sz(r.b.size)} (${d>=0?'−'+d:'+'+-d}%)</b></div></div>`}
+async function MG(box){const n=(await Promise.all(files.map(async f=>(await pdoc(f)).numPages))).reduce((a,b)=>a+b,0);box.innerHTML=`<b>${files.length} files become 1 PDF with ${n} pages</b><p class="mut" style="margin:4px 0 0">Use the arrows to change the order.</p>`}
+function open(t){$('#tool').innerHTML=`<button class="back" onclick="location.hash=''">${ic('left',16)} All tools</button><h2>${t.i} ${t.n}</h2><p class="mut">${t.d}</p><div id="body"></div>`;const b=$('#body');if(t.custom)return t.custom(b);
+ b.innerHTML=`<label class="drop" id="dz"><input type="file" hidden id="fi" ${t.multi?'multiple':''} accept="${t.acc=='.pdf'?'.pdf,application/pdf':t.acc}"><div class="ar">${ic('upload',28)}</div><b>Choose ${t.multi?'files':'a file'}</b> or drop ${t.multi?'them':'it'} here${t.acc=='image/*'?'<br><small>You can also paste an image with Ctrl+V</small>':''}</label><div id="fl"></div>${t.opts?`<div id="ow" style="display:none"><div class="opts">${t.opts}</div></div>`:''}<div id="pv" class="panel" hidden></div><button class="big" id="go" disabled>${t.n}</button><div id="st" role="status"></div><div id="out"></div>`;
+ const add=window.addF=l=>{const a=[...l].filter(f=>okF(t,f));if(!a.length)return st('That file type is not supported here.',1);files=t.multi?files.concat(a):[a[0]];st('');list()};
+ $('#fi').onchange=e=>{add(e.target.files);e.target.value=''};const dz=$('#dz');dz.ondragover=e=>{e.preventDefault();dz.classList.add('on')};dz.ondragleave=()=>dz.classList.remove('on');dz.ondrop=e=>{e.preventDefault();dz.classList.remove('on');add(e.dataTransfer.files)};
+ b.addEventListener('input',pv);
+ $('#go').onclick=async()=>{$('#go').disabled=true;$('#out').innerHTML='';st('Working…');try{await t.run();if($('#st').textContent=='Working…')st('Done. Your file is ready below.')}catch(e){st('Something went wrong: '+(e.message||e)+'. If the PDF is password-protected, unlock it first.',1)}list();$('#out').scrollIntoView({behavior:'smooth',block:'nearest'})}}
+onpaste=e=>{if(cur&&cur.acc=='image/*'&&$('#fi')){const a=[...e.clipboardData.files].filter(f=>f.type.startsWith('image/'));if(a.length)addF(a)}};
+function list(){const t=cur;$('#fl').innerHTML='';files.forEach((f,i)=>{const d=document.createElement('div');d.className='row';d.innerHTML=`<img class="th" alt=""><div><b>${esc(f.name)}</b><small>${sz(f.size)}<span class="np"></span></small></div>`+(t.multi&&files.length>1?'<button class="ghost" aria-label="Move up">'+ic('up',16)+'</button><button class="ghost" aria-label="Move down">'+ic('down',16)+'</button>':'')+'<button class="ghost" aria-label="Remove">'+ic('x',16)+'</button>';
+ const im=d.querySelector('img'),bs=d.querySelectorAll('button'),mv=k=>{const j=i+k;if(j<0||j>=files.length)return;[files[i],files[j]]=[files[j],files[i]];list()};
+ if(isP(f))pdoc(f).then(async pd=>{d.querySelector('.np').textContent=' · '+pd.numPages+(pd.numPages>1?' pages':' page');im.src=(await rp(pd,1,90)).toDataURL()}).catch(()=>{im.removeAttribute('src');d.querySelector('.np').textContent=' · could not read (password-protected?)'});else im.src=f.u||(f.u=URL.createObjectURL(f));
+ if(t.multi&&files.length>1){bs[0].onclick=()=>mv(-1);bs[1].onclick=()=>mv(1)}bs[bs.length-1].onclick=()=>{files.splice(i,1);list()};$('#fl').append(d)});
+ $('#go').disabled=files.length<(t.min||1);if($('#ow'))$('#ow').style.display=files.length?'':'none';$('#dz').style.padding=files.length?'14px':'';pv()}
+</script><script>
+const isP=f=>/\.pdf$/i.test(f.name),isI=f=>f.type.startsWith('image/'),okF=(t,f)=>(t.acc!='image/*'&&isP(f))||(t.acc!='.pdf'&&isI(f));
+const kbSet=v=>{const e=$('#o_kb');$('#o_ku').value='KB';e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}))};
+const preset=v=>{const a=v.split(',');if(!a[0])return;$('#o_mode').value='px';$('#o_w').value=a[0];$('#o_h').value=a[1];$('#o_fit').value='cover';$('#o_kb').value=a[2]||'';$('#o_ku').value='KB';$('#o_w').dispatchEvent(new Event('input',{bubbles:true}))};
+const KB=`<div class="f"><label>Max file size (optional)</label><div style="display:flex;gap:6px"><input id="o_kb" type="number" min="1" step="any" placeholder="no limit"><select id="o_ku" style="width:92px"><option>KB</option><option>MB</option></select></div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">${[50,100,200,500,1024].map(v=>`<button type="button" class="ghost" style="padding:4px 10px" onclick="kbSet(${v})">${v>=1024?'1 MB':v+' KB'}</button>`).join('')}</div></div>`;
+
+const CROP=sel('cr','Crop shape',[['free','Free / none'],['1:1','Square 1:1'],['4:5','Portrait 4:5'],['3:4','Portrait 3:4'],['4:3','Landscape 4:3'],['16:9','Wide 16:9'],['35:45','Passport 35:45']])+`<div class="f"><label>Crop mode</label><div style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="ghost" onclick="cropBtn()">${ic('crop',16)} Crop photo…</button><button type="button" class="ghost" onclick="cropClear()">${ic('x',16)} Remove</button></div><small id="cl"></small></div>`;
+const PH='<div data-k="img" style="display:contents">'+sel('pre','Preset size',[['','Custom'],['413,531,100','Passport photo 35×45 mm (≤100 KB)'],['300,80,60','Signature 300×80 (≤60 KB)'],['300,300,100','ID photo 300×300 (≤100 KB)'],['600,600,','Passport 2×2 in'],['500,500,','Profile picture 500×500'],['1080,1080,','Square 1080×1080'],['1280,720,','HD 1280×720'],['1920,1080,','Full HD 1920×1080'],['820,312,','Facebook cover']]).replace('<select','<select onchange="preset(this.value)"')+sel('mode','Resize by',[['px','Pixels'],['pct','Percent']])+inp('w','Width (px)','','number','placeholder="auto"')+inp('h','Height (px)','','number','placeholder="auto"')+inp('pct','Percent',50,'number')+sel('fit','Shape',[['fit','Fit inside (keep proportions)'],['cover','Fill and crop to exact size'],['stretch','Stretch to exact size']])+CROP+sel('rot','Rotate or flip',[['0','None'],['90','Rotate 90° right'],['180','Rotate 180°'],['270','Rotate 90° left'],['fh','Flip horizontal'],['fv','Flip vertical']])+sel('fmt','Format',[['orig','Keep original'],['image/jpeg','JPG'],['image/png','PNG'],['image/webp','WebP']])+inp('q','Quality %',85,'range','min=30 max=100')+inp('bg','Background (for JPG)','#ffffff','color')+'</div>';
+const PO='<div data-k="pdf" style="display:contents">'+sel('pm','PDF method',[['keep','Keep text selectable if possible'],['img','Shrink as images (smallest)']])+sel('plvl','PDF level (when no size limit)',[['1.6,.7','Balanced'],['1.2,.5','Strong'],['2,.85','Light']])+'</div>';
+async function encode(f,bm){bm=await cropBm(f,bm||await createImageBitmap(f));const r=o('rot'),q9=r=='90'||r=='270',iw=q9?bm.height:bm.width,ih=q9?bm.width:bm.height,ar=iw/ih,kb=+o('kb');let w=+o('w'),h=+o('h');
+ if(o('mode')=='pct'){w=Math.round(iw*o('pct')/100);h=Math.round(ih*o('pct')/100)}else if(w&&!h)h=Math.round(w/ar);else if(h&&!w)w=Math.round(h*ar);else if(!w&&!h){w=iw;h=ih}else if(o('fit')=='fit'){const k=Math.min(w/iw,h/ih);w=Math.round(iw*k);h=Math.round(ih*k)}
+ w=Math.max(1,w);h=Math.max(1,h);let t=o('fmt');if(t=='orig')t=['image/jpeg','image/png','image/webp'].includes(f.type)?f.type:'image/jpeg';if(kb&&t=='image/png'&&o('fmt')=='orig')t='image/jpeg';
+ const cov=o('fit')=='cover'&&o('mode')=='px'&&+o('w')&&+o('h'),dr=s=>{const W=Math.max(1,Math.round(w*s)),H=Math.max(1,Math.round(h*s)),c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');if(t=='image/jpeg'){x.fillStyle=o('bg');x.fillRect(0,0,W,H)}x.imageSmoothingQuality='high';x.translate(W/2,H/2);const sx=cov?Math.max(W/iw,H/ih):W/iw,sy=cov?sx:H/ih;x.scale(sx,sy);x.scale(r=='fh'?-1:1,r=='fv'?-1:1);if(+r)x.rotate(+r*Math.PI/180);x.drawImage(bm,-bm.width/2,-bm.height/2);return c};
+ let s=1,b,c;for(let n=0;n<9;n++){c=dr(s);if(!kb||t=='image/png'){b=await blobOf(c,t,o('q')/100);break}
+  const lim=kb*1024;let lo=.3,hi=.95;b=await blobOf(c,t,lo);if(b.size>lim){s*=.85;continue}for(let i=0;i<6;i++){const m=(lo+hi)/2,x=await blobOf(c,t,m);if(x.size<=lim){b=x;lo=m}else hi=m}break}
+ return{b,w:c.width,h:c.height,note:(s<1?'Also scaled down to reach the size limit. ':'')+(kb&&b.size>kb*1024?'Could not reach '+kb+' KB.':''),n:`${base(f)}-${c.width}x${c.height}.${t.split('/')[1].replace('jpeg','jpg')}`}}
+const keepP=async f=>pdfB(await(await ld(f)).save({useObjectStreams:true}));
+async function cpdf(f,kb,lvl,pm){const tgt=kb*1024,res=(b,m)=>({b,note:`${f.name}: ${sz(f.size)} → ${sz(b.size)} (${b.size<f.size?'−'+Math.round((1-b.size/f.size)*100):'+'+Math.round((b.size/f.size-1)*100)}%)${m||''}`});
+ if(pm=='keep'){let b=await keepP(f);if(b.size>=f.size)b=f;if(!kb||b.size<=tgt)return res(b,b==f?' · already optimized':' · text kept')}
+ const pd=await P.getDocument({data:new Uint8Array(await f.arrayBuffer())}).promise;
+ const run=async(sc,q)=>{const d=await L.PDFDocument.create();for(let i=1;i<=pd.numPages;i++){st(`${f.name}: page ${i} of ${pd.numPages} (quality ${Math.round(q*100)}%)`);const pg=await pd.getPage(i),v=pg.getViewport({scale:sc}),c=document.createElement('canvas');c.width=v.width;c.height=v.height;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);await pg.render({canvasContext:x,viewport:v}).promise;const im=await d.embedJpg(await(await blobOf(c,'image/jpeg',q)).arrayBuffer()),b=pg.getViewport({scale:1});d.addPage([b.width,b.height]).drawImage(im,{x:0,y:0,width:b.width,height:b.height})}return pdfB(await d.save())};
+ let[sc,q]=lvl.split(',').map(Number);if(!kb){const b=await run(sc,q);return b.size>=f.size?res(f,' · already small, original kept'):res(b)}
+ let best;for(let a=0;a<5;a++){const b=await run(sc,q),good=b.size<=tgt;if(!best||(good&&(best.size>tgt||b.size>best.size))||(!good&&best.size>tgt&&b.size<best.size))best=b;if(good&&b.size>tgt*.7)break;const r=Math.sqrt(tgt/b.size);sc=Math.min(2.5,Math.max(.4,sc*r*(good?.95:.9)));q=good?Math.min(.9,q+.08):Math.max(.35,q-.1)}
+ return res(best,best.size>tgt?` · could not reach ${kb} KB, try a bigger limit`:pm=='keep'?' · text became images to fit your limit':'')}
+Object.assign(T.find(t=>t.id=='resize'),{n:'Resize & Compress',d:'Resize photos and shrink PDFs to an exact file size. Handles JPG, PNG, WebP and PDF.',acc:'image/*,.pdf,application/pdf',multi:1,opts:PH+KB+PO,
+ async run(){const e=[],ns=[];for(const f of files){let b,n;if(isP(f)){const r=await cpdf(f,+o('kb'),o('plvl'),o('pm'));b=r.b;n=base(f)+'-compressed.pdf';ns.push(r.note)}else{const r=await encode(f);b=r.b;n=r.n;ns.push(`${f.name}: ${sz(f.size)} → ${sz(b.size)}${r.note?' · '+r.note:''}`)}e.push({n,b});out(b,n)}if(e.length>1)await zip(e,'compressed-files.zip');st(ns.join('  |  '))}});
+Object.assign(T.find(t=>t.id=='compress'),{n:'Compress PDF',d:'Shrink a PDF to the size you need, such as under 500 KB.',opts:KB+PO,async run(){const f=files[0],r=await cpdf(f,+o('kb'),o('plvl'),o('pm'));out(r.b,base(f)+'-compressed.pdf');st(r.note)}});
+PV.resize=async function(box,id){const f=files[0];if(isP(f)){const pd=await pdoc(f),c=await rp(pd,1,260);if(id!=pvId)return;box.innerHTML=`<div class="cmp"><div><small>PDF, page 1</small><img alt="" src="${c.toDataURL('image/jpeg',.7)}"><b>${pd.numPages} pages · ${sz(f.size)}</b></div><div><p class="mut">${+o('kb')?`It will be shrunk to about ${o('kb')} KB or less.`:'Set a max size above, or pick a level, then press the button.'}</p></div></div>`;return}
+ const bm=await createImageBitmap(f),r=await encode(f,bm);if(id!=pvId)return;const d=Math.round((1-r.b.size/f.size)*100);
+ box.innerHTML=`<div class="cmp"><div><small>Original</small><img alt="Original" src="${f.u||(f.u=URL.createObjectURL(f))}"><b>${bm.width}×${bm.height} · ${sz(f.size)}</b></div><div><small>After (live preview${files.length>1?', first file':''})</small><img alt="Result" src="${URL.createObjectURL(r.b)}"><b>${r.w}×${r.h} · ${sz(r.b.size)} (${d>=0?'−'+d:'+'+-d}%)</b></div></div>${r.note?`<p class="mut" style="margin:8px 0 0">${r.note}</p>`:''}`};
+function vis(){if(cur&&cur.id=='resize'){const a=files.some(isI)||!files.length,b=files.some(isP);document.querySelectorAll('[data-k]').forEach(e=>e.style.display=(e.dataset.k=='img'?a:b)?'contents':'none')}}
+const _pv=pv;pv=function(){vis();_pv()};
+/* ===== v2: scanner, crop, icons ===== */
+const sleep=ms=>new Promise(r=>setTimeout(r,ms)),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),DEFQ=[[.05,.05],[.95,.05],[.95,.95],[.05,.95]];
+const ratio=()=>{const v=($('#o_cr')||{}).value;if(!v||v=='free')return 0;const[a,b]=v.split(':');return a/b};
+async function cropBm(f,bm){let c=f.crop;const a=ratio(),W=bm.width,H=bm.height;
+ if(!c&&a){let w=W,h=W/a;if(h>H){h=H;w=H*a}c={x:(W-w)/2/W,y:(H-h)/2/H,w:w/W,h:h/H}}
+ if(!c)return bm;const k=document.createElement('canvas');k.width=Math.max(1,Math.round(c.w*W));k.height=Math.max(1,Math.round(c.h*H));k.getContext('2d').drawImage(bm,c.x*W,c.y*H,k.width,k.height,0,0,k.width,k.height);return createImageBitmap(k)}
+function cropClear(){files.forEach(f=>delete f.crop);$('#cl').textContent='';pv()}
+async function cropBtn(){const f=files.find(isI);if(!f)return st('Add a photo first.',1);const bm=await createImageBitmap(f),m=document.createElement('div');m.className='cam';
+ m.innerHTML=`<div class="camb"><canvas id="cc" style="max-width:100%;touch-action:none;border-radius:10px"></canvas></div><div class="camc"><button class="big" id="cOk">${ic('crop')} Apply crop</button><button class="ghost" id="cRs">Reset</button><button class="ghost" id="cNo">Cancel</button></div>`;document.body.append(m);
+ const c=m.querySelector('#cc'),k=Math.min(1,(innerWidth-24)/bm.width,(innerHeight-170)/bm.height),W=c.width=Math.round(bm.width*k),H=c.height=Math.round(bm.height*k),x=c.getContext('2d');
+ let R=f.crop?{x:f.crop.x*W,y:f.crop.y*H,w:f.crop.w*W,h:f.crop.h*H}:{x:W*.08,y:H*.08,w:W*.84,h:H*.84},a=ratio();
+ const fix=()=>{if(a){let w=R.w,h=w/a;if(h>H){h=H;w=h*a}R={x:cl(R.x,0,W-w),y:cl(R.y,0,H-h),w,h}}};fix();
+ const draw=()=>{x.drawImage(bm,0,0,W,H);x.fillStyle='rgba(0,0,0,.5)';x.beginPath();x.rect(0,0,W,H);x.rect(R.x,R.y,R.w,R.h);x.fill('evenodd');x.strokeStyle='#fff';x.lineWidth=2;x.strokeRect(R.x,R.y,R.w,R.h);x.lineWidth=1;x.globalAlpha=.5;for(let i=1;i<3;i++){x.beginPath();x.moveTo(R.x+R.w*i/3,R.y);x.lineTo(R.x+R.w*i/3,R.y+R.h);x.moveTo(R.x,R.y+R.h*i/3);x.lineTo(R.x+R.w,R.y+R.h*i/3);x.stroke()}x.globalAlpha=1;
+  [[R.x,R.y],[R.x+R.w,R.y],[R.x+R.w,R.y+R.h],[R.x,R.y+R.h]].forEach(p=>{x.fillStyle='#2f5bff';x.beginPath();x.arc(p[0],p[1],10,0,7);x.fill();x.strokeStyle='#fff';x.lineWidth=2;x.stroke()})};draw();
+ let dr=null;const pt=e=>{const r=c.getBoundingClientRect();return[(e.clientX-r.left)*W/r.width,(e.clientY-r.top)*H/r.height]};
+ c.onpointerdown=e=>{const[px,py]=pt(e),cs=[[R.x,R.y],[R.x+R.w,R.y],[R.x+R.w,R.y+R.h],[R.x,R.y+R.h]];let b=-1,bd=34;cs.forEach((p,i)=>{const d=Math.hypot(p[0]-px,p[1]-py);if(d<bd){bd=d;b=i}});
+  if(b>=0)dr={t:'c',an:cs[(b+2)%4]};else if(px>R.x&&px<R.x+R.w&&py>R.y&&py<R.y+R.h)dr={t:'m',dx:px-R.x,dy:py-R.y};if(dr)c.setPointerCapture(e.pointerId)};
+ c.onpointermove=e=>{if(!dr)return;const[px,py]=pt(e);if(dr.t=='m'){R.x=cl(px-dr.dx,0,W-R.w);R.y=cl(py-dr.dy,0,H-R.h)}else{const[ax,ay]=dr.an;let w=cl(px,0,W)-ax,h=cl(py,0,H)-ay;
+   if(a){h=(h<0?-1:1)*Math.abs(w)/a;if(ay+h<0||ay+h>H){const mh=h<0?ay:H-ay;h=(h<0?-1:1)*mh;w=(w<0?-1:1)*mh*a}}
+   R={x:Math.min(ax,ax+w),y:Math.min(ay,ay+h),w:Math.max(20,Math.abs(w)),h:Math.max(20,Math.abs(h))}}draw()};
+ c.onpointerup=()=>dr=null;
+ m.querySelector('#cRs').onclick=()=>{R={x:0,y:0,w:W,h:H};fix();draw()};m.querySelector('#cNo').onclick=()=>m.remove();
+ m.querySelector('#cOk').onclick=()=>{const n={x:R.x/W,y:R.y/H,w:R.w/W,h:R.h/H};files.filter(isI).forEach(g=>g.crop=n);$('#cl').textContent='Crop set: '+Math.round(n.w*bm.width)+'×'+Math.round(n.h*bm.height)+' px'+(files.filter(isI).length>1?' (applied to all photos)':'');m.remove();pv()}}
+
+/* ---- document scanner ---- */
+function polyArea(P){let a=0;for(let i=0;i<P.length;i++){const p=P[i],q=P[(i+1)%P.length];a+=p[0]*q[1]-q[0]*p[1]}return a/2}
+function hull2(pts){pts.sort((a,b)=>a[0]-b[0]||a[1]-b[1]);const cr=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]),lo=[],up=[];
+ for(const p of pts){while(lo.length>1&&cr(lo[lo.length-2],lo[lo.length-1],p)<=0)lo.pop();lo.push(p)}
+ for(let i=pts.length-1;i>=0;i--){const p=pts[i];while(up.length>1&&cr(up[up.length-2],up[up.length-1],p)<=0)up.pop();up.push(p)}lo.pop();up.pop();return lo.concat(up)}
+function quad4(P){P=P.slice();let g=300;
+ while(P.length>4&&g--){let bi=-1,ba=1e18,bx=null;const n=P.length;
+  for(let i=0;i<n;i++){const a=P[(i+n-1)%n],b=P[i],c=P[(i+1)%n],d=P[(i+2)%n],r1x=b[0]-a[0],r1y=b[1]-a[1],r2x=d[0]-c[0],r2y=d[1]-c[1],den=r1x*r2y-r1y*r2x;if(Math.abs(den)<1e-9)continue;
+   const t=((c[0]-a[0])*r2y-(c[1]-a[1])*r2x)/den;if(t<=1)continue;const X=[a[0]+t*r1x,a[1]+t*r1y],ad=Math.abs(polyArea([b,X,c]));if(ad<ba){ba=ad;bi=i;bx=X}}
+  if(bi<0)break;P=P.slice(bi).concat(P.slice(0,bi));P.splice(0,2,bx)}
+ while(P.length>4){let bi=0,ba=1e18;const n=P.length;for(let i=0;i<n;i++){const t=Math.abs(polyArea([P[(i+n-1)%n],P[i],P[(i+1)%n]]));if(t<ba){ba=t;bi=i}}P.splice(bi,1)}
+ return P}
+function otsu(g,N){const H=new Array(256).fill(0);for(let i=0;i<N;i++)H[g[i]]++;let sum=0;for(let i=0;i<256;i++)sum+=i*H[i];let wb=0,sb=0,mx=-1,th=128;
+ for(let t=0;t<256;t++){wb+=H[t];if(!wb)continue;const wf=N-wb;if(!wf)break;sb+=t*H[t];const v=wb*wf*(sb/wb-(sum-sb)/wf)**2;if(v>mx){mx=v;th=t}}return th}
+function detect(s){const SW=s.videoWidth||s.width,SH=s.videoHeight||s.height,k=Math.min(1,256/Math.max(SW,SH)),w=Math.max(16,Math.round(SW*k)),h=Math.max(16,Math.round(SH*k)),N=w*h,c=document.createElement('canvas');c.width=w;c.height=h;
+ const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(s,0,0,w,h);const d=x.getImageData(0,0,w,h).data,bl=new Float32Array(N*3),g=new Uint8Array(N);
+ for(let y=0;y<h;y++)for(let X=0;X<w;X++)for(let ch=0;ch<3;ch++){let t=0,n=0;for(let dy=-1;dy<=1;dy++){const yy=y+dy;if(yy<0||yy>=h)continue;for(let dx=-1;dx<=1;dx++){const xx=X+dx;if(xx<0||xx>=w)continue;t+=d[(yy*w+xx)*4+ch];n++}}bl[(y*w+X)*3+ch]=t/n}
+ for(let i=0;i<N;i++)g[i]=bl[i*3]*.299+bl[i*3+1]*.587+bl[i*3+2]*.114;
+ /* background colour = median of the frame border */
+ const bd=[[],[],[]];for(let y=0;y<h;y++)for(let X=0;X<w;X++)if(y<3||X<3||y>=h-3||X>=w-3)for(let ch=0;ch<3;ch++)bd[ch].push(bl[(y*w+X)*3+ch]);const bg=bd.map(a=>a.sort((p,q)=>p-q)[a.length>>1]),dm=new Uint8Array(N);
+ for(let i=0;i<N;i++)dm[i]=Math.min(255,Math.hypot(bl[i*3]-bg[0],bl[i*3+1]-bg[1],bl[i*3+2]-bg[2])*1.5);
+ const ta=otsu(g,N),tc=otsu(dm,N),masks=[g.map(v=>v>ta?1:0),g.map(v=>v<=ta?1:0),dm.map(v=>v>tc?1:0)];let best=null;
+ {const hi=g.filter(v=>v>ta),lo=g.filter(v=>v<=ta);if(hi.length>N*.1){const t=otsu(hi,hi.length);masks.push(g.map(v=>v>t?1:0))}if(lo.length>N*.1){const t=otsu(lo,lo.length);masks.push(g.map(v=>v<=t?1:0))}}
+ for(const m of masks){let cnt=0;for(let i=0;i<N;i++)cnt+=m[i];if(cnt<N*.08||cnt>N*.92)continue;
+  const lab=new Int32Array(N);let comp=[],id=0;
+  for(let i=0;i<N;i++)if(m[i]&&!lab[i]){id++;const st=[i],cp=[];lab[i]=id;while(st.length){const p=st.pop();cp.push(p);const px=p%w,py=p/w|0;
+   if(px>0&&m[p-1]&&!lab[p-1]){lab[p-1]=id;st.push(p-1)}if(px<w-1&&m[p+1]&&!lab[p+1]){lab[p+1]=id;st.push(p+1)}if(py>0&&m[p-w]&&!lab[p-w]){lab[p-w]=id;st.push(p-w)}if(py<h-1&&m[p+w]&&!lab[p+w]){lab[p+w]=id;st.push(p+w)}}
+   if(cp.length>comp.length)comp=cp}
+  if(comp.length<N*.08)continue;
+  const mn=new Int16Array(h).fill(32767),mxr=new Int16Array(h).fill(-1);for(const p of comp){const px=p%w,py=p/w|0;if(px<mn[py])mn[py]=px;if(px>mxr[py])mxr[py]=px}
+  const pts=[];for(let y=0;y<h;y++)if(mxr[y]>=0){pts.push([mn[y],y],[mxr[y]+1,y],[mn[y],y+1],[mxr[y]+1,y+1])}
+  let Q=quad4(hull2(pts));if(Q.length<4)continue;let sp=0;for(let y=0;y<h;y++)if(mxr[y]>=0)sp+=mxr[y]-mn[y]+1;const A=Math.abs(polyArea(Q)),af=A/N,fill=Math.min(1,(.5*comp.length+.5*sp)/A);
+  const xs=Q.map(p=>p[0]),ys=Q.map(p=>p[1]),sides=(Math.min(...xs)<=1)+(Math.max(...xs)>=w-1)+(Math.min(...ys)<=1)+(Math.max(...ys)>=h-1);
+  if(af<.1||af>.97||fill<.7||(sides>=3&&af>.9))continue;const score=fill*fill*(.8+.2*Math.min(1,af/.3));if(!best||score>best.s)best={Q,s:score}}
+ if(!best||best.s<.55)return null;let Q=best.Q;if(polyArea(Q)<0)Q.reverse();let f=0,fv=1e9;Q.forEach((p,i)=>{if(p[0]+p[1]<fv){fv=p[0]+p[1];f=i}});Q=Q.slice(f).concat(Q.slice(0,f));
+ let q=Q.map(p=>[cl(p[0]/w,0,1),cl(p[1]/h,0,1)]);const cx0=q.reduce((t,a)=>t+a[0],0)/4,cy0=q.reduce((t,a)=>t+a[1],0)/4;q=q.map(a=>[cx0+(a[0]-cx0)*.99,cy0+(a[1]-cy0)*.99]);q.s=best.s;return q}
+
+function render(p,maxD){const s=p.src,sw=s.width,sh=s.height,q=p.q.map(a=>[a[0]*sw,a[1]*sh]),dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+ let w=Math.max(dist(q[0],q[1]),dist(q[3],q[2])),h=Math.max(dist(q[0],q[3]),dist(q[1],q[2]));const k=Math.min(1,maxD/Math.max(w,h));w=Math.max(8,Math.round(w*k));h=Math.max(8,Math.round(h*k));
+ if(!p.sd){const t=document.createElement('canvas');t.width=sw;t.height=sh;const tx=t.getContext('2d',{willReadFrequently:true});tx.drawImage(s,0,0);p.sd=tx.getImageData(0,0,sw,sh).data}
+ const sd=p.sd,o=document.createElement('canvas');o.width=w;o.height=h;const ox=o.getContext('2d',{willReadFrequently:true}),D=ox.createImageData(w,h),dd=D.data;
+ const[x0,y0]=q[0],[x1,y1]=q[1],[x2,y2]=q[2],[x3,y3]=q[3],dx1=x1-x2,dx2=x3-x2,dx3=x0-x1+x2-x3,dy1=y1-y2,dy2=y3-y2,dy3=y0-y1+y2-y3,den=dx1*dy2-dx2*dy1,
+ g=den?(dx3*dy2-dx2*dy3)/den:0,hh=den?(dx1*dy3-dx3*dy1)/den:0,a=x1-x0+g*x1,b=x3-x0+hh*x3,d2=y1-y0+g*y1,e=y3-y0+hh*y3;
+ for(let j=0,i=0;j<h;j++){const v=j/(h-1);for(let u0=0;u0<w;u0++,i+=4){const u=u0/(w-1),z=g*u+hh*v+1,X=cl((a*u+b*v+x0)/z,0,sw-1.01),Y=cl((d2*u+e*v+y0)/z,0,sh-1.01),xi=X|0,yi=Y|0,fx=X-xi,fy=Y-yi,p0=(yi*sw+xi)*4,p2=p0+sw*4;
+  for(let c=0;c<3;c++)dd[i+c]=(sd[p0+c]*(1-fx)+sd[p0+4+c]*fx)*(1-fy)+(sd[p2+c]*(1-fx)+sd[p2+4+c]*fx)*fy;dd[i+3]=255}}
+ ox.putImageData(D,0,0);enh(o,p.f,p.br,p.ct);
+ if(!p.rot)return o;const r=document.createElement('canvas'),q9=p.rot%180;r.width=q9?h:w;r.height=q9?w:h;const rx=r.getContext('2d');rx.translate(r.width/2,r.height/2);rx.rotate(p.rot*Math.PI/180);rx.drawImage(o,-w/2,-h/2);return r}
+
+function enh(o,m,br,ct){const w=o.width,h=o.height,x=o.getContext('2d',{willReadFrequently:true}),I=x.getImageData(0,0,w,h),d=I.data,n=w*h,bc=v=>(v-128)*(1+ct/100)+128+br*2.55;
+ if(m=='magic'||m=='gray'||m=='bw'){const sw=Math.max(8,w/24|0),sh=Math.max(8,h/24|0),s=document.createElement('canvas');s.width=sw;s.height=sh;const sx=s.getContext('2d',{willReadFrequently:true});sx.drawImage(o,0,0,sw,sh);const S=sx.getImageData(0,0,sw,sh),a=S.data,b=new Uint8ClampedArray(a);
+  for(let r=0;r<2;r++){for(let j=0;j<sh;j++)for(let i=0;i<sw;i++)for(let c=0;c<3;c++){let mx=0;for(let dj=-1;dj<=1;dj++)for(let di=-1;di<=1;di++){const jj=j+dj,ii=i+di;if(jj>=0&&jj<sh&&ii>=0&&ii<sw)mx=Math.max(mx,a[(jj*sw+ii)*4+c])}b[(j*sw+i)*4+c]=mx}a.set(b)}
+  sx.putImageData(S,0,0);const B=document.createElement('canvas');B.width=w;B.height=h;const bx=B.getContext('2d',{willReadFrequently:true});bx.imageSmoothingQuality='high';bx.drawImage(s,0,0,w,h);const bd=bx.getImageData(0,0,w,h).data;
+  for(let i=0;i<n*4;i+=4)for(let c=0;c<3;c++)d[i+c]=d[i+c]/Math.max(40,bd[i+c])*255}
+ if(m=='gray'||m=='bw')for(let i=0;i<n*4;i+=4)d[i]=d[i+1]=d[i+2]=d[i]*.299+d[i+1]*.587+d[i+2]*.114;
+ if(m=='auto'){const hs=[0,1,2].map(()=>new Uint32Array(256));for(let i=0;i<n*4;i+=4)for(let c=0;c<3;c++)hs[c][d[i+c]]++;
+  const T=hs.map(H=>{let a=0,lo=0,hi=255;for(;lo<255&&(a+=H[lo])<n*.005;lo++);a=0;for(;hi>0&&(a+=H[hi])<n*.005;hi--);hi=Math.max(hi,lo+20);return Uint8ClampedArray.from({length:256},(_,v)=>bc(255*Math.pow(Math.max(0,v-lo)/(hi-lo),.9)))});
+  for(let i=0;i<n*4;i+=4)for(let c=0;c<3;c++)d[i+c]=T[c][d[i+c]]}
+ else{const T=Uint8ClampedArray.from({length:256},(_,v)=>bc(m=='bw'?(v-170)*8+128:m=='orig'?v:(v-45)*255/190));for(let i=0;i<n*4;i+=4)for(let c=0;c<3;c++)d[i+c]=T[c][d[i+c]]}
+ x.putImageData(I,0,0)}
+
+async function fit(c,t,lim,q){let b=await blobOf(c,t,q);if(!lim||t=='image/png'||b.size<=lim)return b;let s=1,x=b;
+ for(let n=0;n<9;n++){let cc=c;if(s<1){cc=document.createElement('canvas');cc.width=Math.round(c.width*s);cc.height=Math.round(c.height*s);cc.getContext('2d').drawImage(c,0,0,cc.width,cc.height)}
+  let lo=.3,hi=q;x=await blobOf(cc,t,lo);if(x.size>lim){s*=.8;continue}for(let i=0;i<6;i++){const m=(lo+hi)/2,y=await blobOf(cc,t,m);if(y.size<=lim){x=y;lo=m}else hi=m}return x}return x}
+
+function scanUI(el){let pg=[],ci=-1,mode='crop',drag=-1,stream=null,timer=null;const FL=[['auto','Auto','spark'],['magic','Magic color','wand'],['orig','Original','image'],['gray','Gray','file'],['bw','B&W','scan']];
+ el.innerHTML=`<div class="scn"><div class="panel"><div class="sbt"><button id="sCam">${ic('camera')} Scan with camera</button><label class="btn ghost">${ic('upload')} Upload photos<input type="file" id="sUp" accept="image/*" multiple hidden></label><label class="btn ghost">${ic('camera')} Phone camera app<input type="file" id="sCap" accept="image/*" capture="environment" hidden></label></div>
+ <div class="pg" id="sTh" style="margin-top:12px;max-height:460px"></div><div id="st" role="status"></div><small class="mut" id="sHint">Add one or more pages. Edges are found automatically and you can fine-tune the corners.</small></div>
+ <div class="panel ctr" id="sEd" hidden><div class="seg" id="sMd"><button class="chip on" data-m="crop">${ic('crop',16)} Edges</button><button class="chip" data-m="res">${ic('eye',16)} Result</button></div><canvas id="sc"></canvas>
+ <div class="seg" id="sFl">${FL.map(f=>`<button class="chip" data-f="${f[0]}">${ic(f[2],16)} ${f[1]}</button>`).join('')}</div>
+ <div class="sl"><div class="f"><label>Brightness</label><input type="range" id="sBr" min="-50" max="50" value="0"></div><div class="f"><label>Contrast</label><input type="range" id="sCt" min="-50" max="80" value="0"></div></div>
+ <label class="mut"><input type="checkbox" id="sAll" checked> Apply filter to all pages</label>
+ <div class="seg"><button class="ghost" id="sDet">${ic('wand',16)} Auto edges</button><button class="ghost" id="sFull">${ic('full',16)} Full page</button><button class="ghost" id="sRot">${ic('rotate',16)} Rotate</button><button class="ghost" id="sL">${ic('left',16)}</button><button class="ghost" id="sR" style="transform:scaleX(-1)">${ic('left',16)}</button><button class="ghost" id="sDel">${ic('trash',16)} Delete</button></div></div></div>
+ <div class="panel" id="sEx" style="margin-top:20px" hidden><h2 style="font-size:20px">${ic('download')} Export</h2><div class="opts">${sel('xf','Export as',[['pdf','PDF document'],['jpg','JPG images'],['png','PNG images'],['webp','WebP images']])+sel('xp','PDF page size',[['a4','A4'],['letter','US Letter'],['fit','Same as scan']])+sel('xr','Resolution',[[1000,'Small (1000 px)'],[1600,'Standard (1600 px)'],[2400,'High (2400 px)']]).replace('value="1600"','value="1600" selected')+inp('q','Quality %',90,'range','min=40 max=100')+KB+inp('nm','File name','scan-'+new Date().toISOString().slice(0,10))}</div>
+ <small class="mut">The size limit is for the whole PDF, or for each image.</small><button class="big" id="sGo" style="margin-top:10px">${ic('download')} Export</button><div id="out"></div></div>`;
+ const cvs=$('#sc'),cx=cvs.getContext('2d');
+ const th=p=>p.th||(p.th=render(p,150).toDataURL('image/jpeg',.6));
+ function thumbs(){$('#sTh').innerHTML=pg.map((p,i)=>`<div class="cell ${i==ci?'on':''}" data-i="${i}"><img src="${th(p)}" alt="Page ${i+1}"><span>${i+1}</span></div>`).join('');$('#sEd').hidden=$('#sEx').hidden=!pg.length;$('#sHint').textContent=pg.length?pg.length+' page'+(pg.length>1?'s':'')+' · tap a page to edit':'Add one or more pages. Edges are found automatically and you can fine-tune the corners.';
+  if(pg[ci]){$('#sBr').value=pg[ci].br;$('#sCt').value=pg[ci].ct;document.querySelectorAll('#sFl .chip').forEach(b=>b.classList.toggle('on',b.dataset.f==pg[ci].f))}}
+ function show(){const p=pg[ci];if(!p)return;if(mode=='crop'){const s=p.src,k=Math.min(1,720/s.width),W=cvs.width=Math.round(s.width*k),H=cvs.height=Math.round(s.height*k);cx.drawImage(s,0,0,W,H);const q=p.q.map(a=>[a[0]*W,a[1]*H]);
+   cx.fillStyle='rgba(0,0,0,.5)';cx.beginPath();cx.rect(0,0,W,H);cx.moveTo(...q[0]);q.slice(1).forEach(a=>cx.lineTo(...a));cx.closePath();cx.fill('evenodd');cx.strokeStyle='#2f5bff';cx.lineWidth=3;cx.beginPath();q.forEach((a,i)=>i?cx.lineTo(...a):cx.moveTo(...a));cx.closePath();cx.stroke();
+   q.forEach(a=>{cx.fillStyle='#fff';cx.beginPath();cx.arc(a[0],a[1],12,0,7);cx.fill();cx.stroke()})}else{const r=render(p,900);cvs.width=r.width;cvs.height=r.height;cx.drawImage(r,0,0)}}
+ const sel1=i=>{ci=i;thumbs();show()},touch=p=>{p.th=null};
+ async function addC(c0){const k=Math.min(1,2200/Math.max(c0.width,c0.height)),c=document.createElement('canvas');c.width=Math.round(c0.width*k);c.height=Math.round(c0.height*k);c.getContext('2d').drawImage(c0,0,0,c.width,c.height);
+  const p={src:c,q:detect(c)||DEFQ.map(a=>a.slice()),f:'auto',br:0,ct:0,rot:0};if(pg[0]){p.f=pg[0].f;p.br=pg[0].br;p.ct=pg[0].ct}pg.push(p);sel1(pg.length-1)}
+ async function addF(list){for(const f of list){if(!f.type.startsWith('image/'))continue;$('#st').textContent='Reading '+f.name+'…';const bm=await createImageBitmap(f,{imageOrientation:'from-image'}).catch(()=>createImageBitmap(f));await addC(bm)}$('#st').textContent='';}
+ $('#sUp').onchange=e=>{addF(e.target.files);e.target.value=''};$('#sCap').onchange=e=>{addF(e.target.files);e.target.value=''};
+ $('#sTh').onclick=e=>{const c=e.target.closest('.cell');if(c)sel1(+c.dataset.i)};
+ $('#sMd').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;mode=b.dataset.m;document.querySelectorAll('#sMd .chip').forEach(x=>x.classList.toggle('on',x==b));show()};
+ const each=fn=>{(($('#sAll').checked)?pg:[pg[ci]]).forEach(p=>{fn(p);touch(p)});thumbs();show()};
+ $('#sFl').onclick=e=>{const b=e.target.closest('.chip');if(b&&pg[ci])each(p=>p.f=b.dataset.f)};
+ $('#sBr').oninput=()=>pg[ci]&&each(p=>p.br=+$('#sBr').value);$('#sCt').oninput=()=>pg[ci]&&each(p=>p.ct=+$('#sCt').value);
+ $('#sDet').onclick=()=>{const p=pg[ci];p.q=detect(p.src)||DEFQ.map(a=>a.slice());touch(p);thumbs();show()};$('#sFull').onclick=()=>{pg[ci].q=[[0,0],[1,0],[1,1],[0,1]];touch(pg[ci]);thumbs();show()};
+ $('#sRot').onclick=()=>{const p=pg[ci];p.rot=(p.rot+90)%360;touch(p);thumbs();if(mode=='res')show()};
+ $('#sDel').onclick=()=>{pg.splice(ci,1);ci=Math.min(ci,pg.length-1);thumbs();show()};
+ const mv=k=>{const j=ci+k;if(j<0||j>=pg.length)return;[pg[ci],pg[j]]=[pg[j],pg[ci]];ci=j;thumbs()};$('#sL').onclick=()=>mv(-1);$('#sR').onclick=()=>mv(1);
+ cvs.onpointerdown=e=>{if(mode!='crop'||!pg[ci])return;const r=cvs.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;let b=-1,bd=40;pg[ci].q.forEach((a,i)=>{const d=Math.hypot((a[0]-x)*r.width,(a[1]-y)*r.height);if(d<bd){bd=d;b=i}});if(b>=0){drag=b;cvs.setPointerCapture(e.pointerId)}};
+ cvs.onpointermove=e=>{if(drag<0)return;const r=cvs.getBoundingClientRect();pg[ci].q[drag]=[cl((e.clientX-r.left)/r.width,0,1),cl((e.clientY-r.top)/r.height,0,1)];show()};
+ cvs.onpointerup=()=>{if(drag>=0){drag=-1;touch(pg[ci]);thumbs()}};
+ /* live camera with auto-capture */
+ $('#sCam').onclick=async()=>{try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}}})}catch(e){st('Live camera is not available here ('+(e.name||'error')+'). Use "Phone camera app" or upload photos instead.',1);return}
+  const m=document.createElement('div');m.className='cam';m.innerHTML=`<div class="camb"><div class="vw"><video playsinline muted autoplay></video><canvas class="ov"></canvas></div></div><div class="camc"><label><input type="checkbox" id="cA" checked> Auto-capture</label><button class="big" id="cS">${ic('camera')} Capture</button><button class="ghost" id="cD">Done (${pg.length})</button></div>`;document.body.append(m);
+  const v=m.querySelector('video'),ov=m.querySelector('.ov'),ox=ov.getContext('2d');v.srcObject=stream;await v.play().catch(()=>{});let last=null,hold=0,busy=0;
+  const shot=async()=>{if(busy||!v.videoWidth)return;busy=1;const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);ov.style.background='#fff';setTimeout(()=>ov.style.background='',120);await addC(c);m.querySelector('#cD').textContent='Done ('+pg.length+')';hold=-4;busy=0};
+  const close=()=>{clearInterval(timer);stream&&stream.getTracks().forEach(t=>t.stop());stream=null;m.remove();thumbs();show()};
+  timer=setInterval(()=>{if(!v.videoWidth||busy)return;ov.width=v.videoWidth;ov.height=v.videoHeight;const q=detect(v);ox.clearRect(0,0,ov.width,ov.height);
+   if(!q){hold=Math.min(hold,0);last=null;return}ox.strokeStyle='#22c55e';ox.lineWidth=Math.max(3,ov.width/200);ox.fillStyle='#22c55e33';ox.beginPath();q.forEach((a,i)=>i?ox.lineTo(a[0]*ov.width,a[1]*ov.height):ox.moveTo(a[0]*ov.width,a[1]*ov.height));ox.closePath();ox.fill();ox.stroke();
+   if(last&&q.every((a,i)=>Math.abs(a[0]-last[i][0])<.02&&Math.abs(a[1]-last[i][1])<.02)){if(++hold>=3&&q.s>.75&&m.querySelector('#cA').checked)shot()}else hold=Math.min(hold,0);last=q},450);
+  m.querySelector('#cS').onclick=shot;m.querySelector('#cD').onclick=close};
+ /* export */
+ $('#sGo').onclick=async()=>{const go=$('#sGo');go.disabled=true;$('#out').innerHTML='';try{const f=o('xf'),res=+o('xr'),lim=o('kb')*1024,nm=($('#o_nm').value||'scan').trim(),cs=[];
+  for(let i=0;i<pg.length;i++){st(`Processing page ${i+1} of ${pg.length}…`);await sleep(20);cs.push(render(pg[i],res))}st('Encoding…');await sleep(20);
+  if(f=='pdf'){const d=await L.PDFDocument.create(),per=lim?lim/cs.length:0;for(const c of cs){const b=await fit(c,'image/jpeg',per,+o('q')/100),im=await d.embedJpg(await b.arrayBuffer());let w=im.width*.75,h=im.height*.75,pw=w,ph=h;const z=o('xp');if(z!='fit'){[pw,ph]=z=='a4'?[595.28,841.89]:[612,792];if(w>h)[pw,ph]=[ph,pw];const k=Math.min(pw/w,ph/h);w*=k;h*=k}d.addPage([pw,ph]).drawImage(im,{x:(pw-w)/2,y:(ph-h)/2,width:w,height:h})}
+   const b=pdfB(await d.save());out(b,nm+'.pdf');st(lim&&b.size>lim*1.05?'Done, but '+sz(b.size)+' is above your limit. Use fewer pages or a lower resolution.':'Done · '+sz(b.size))}
+  else{const t=f=='png'&&!lim?'image/png':f=='webp'?'image/webp':'image/jpeg',ex=t=='image/png'?'png':t=='image/webp'?'webp':'jpg',e=[];for(let i=0;i<cs.length;i++)e.push({n:`${nm}-${i+1}.${ex}`,b:await fit(cs[i],t,lim,+o('q')/100)});
+   e.length==1?out(e[0].b,e[0].n):await zip(e,nm+'-images.zip');st('Done · '+e.map(x=>sz(x.b.size)).join(', ')+(f=='png'&&lim?' · PNG is lossless, so JPG was used to meet your size limit':''))}
+  }catch(e){st('Something went wrong: '+(e.message||e),1)}go.disabled=false};
+ $('#sEx').addEventListener('input',()=>{})}
+T.unshift({id:'scan',c:'scan',n:'Document Scanner',d:'Scan with your camera or photos. Auto edges, auto enhance and color, then export as PDF or images.',custom:scanUI});
+/* ===== v3: QR & barcode scanner + everyday tools ===== */
+{
+let CL=[];addEventListener('hashchange',()=>{CL.forEach(f=>{try{f()}catch(e){}});CL=[]});
+Object.assign(IC,{qrscan:'<path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="8" y="8" width="3" height="3"/><rect x="13" y="8" width="3" height="3"/><rect x="8" y="13" width="3" height="3"/><path d="M13 13h3v3"/>',unit:'<path d="M7 7h13l-4-4M17 17H4l4 4"/>',age:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',calc:'<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 19h.01M12 19h.01M16 19h.01"/>',txt:'<path d="M4 6h16M4 12h10M4 18h16"/>',timer:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/>',copy:'<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',ext:'<path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>'});
+const g=s=>$(s)||{},num=v=>v===''||v==null?NaN:+v,fmt=n=>isFinite(n)?(+n.toPrecision(10)).toLocaleString('en',{maximumFractionDigits:6}):'–',S=(t,v)=>`<div><b>${v}</b><small>${t}</small></div>`;
+const beep=(n=1)=>{try{const C=window.AudioContext||window.webkitAudioContext,a=new C();for(let i=0;i<n;i++){const s=a.createOscillator(),v=a.createGain();s.connect(v);v.connect(a.destination);s.frequency.value=880;v.gain.value=.15;s.start(a.currentTime+i*.3);s.stop(a.currentTime+i*.3+.15)}setTimeout(()=>a.close(),n*300+300)}catch(e){}navigator.vibrate&&navigator.vibrate(n>1?[200,100,200,100,200]:60)};
+const cpy=async(b,t)=>{await navigator.clipboard.writeText(t).catch(()=>{});const h=b.innerHTML;b.textContent='Copied';setTimeout(()=>b.innerHTML=h,1200)};
+
+/* ---------- QR & barcode scanner ---------- */
+const qrsUI=el=>{const KEY='pdfstudio-qr-history';let hist=[],stream=null,timer=0,torch=false;
+ try{hist=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){}
+ const det='BarcodeDetector' in window?(()=>{try{return new BarcodeDetector()}catch(e){return null}})():null;
+ el.innerHTML=`<div class="two"><div class="panel"><div class="sbt"><button id="rsCam">${ic('camera')} Scan with camera</button><label class="btn ghost">${ic('upload')} Upload image<input type="file" id="rsUp" accept="image/*" hidden></label></div>
+ <div class="rsv" id="rsVw" hidden><video playsinline muted></video><div class="rsf"></div></div>
+ <div class="seg"><button class="ghost" id="rsTo" hidden>Torch</button><button class="ghost" id="rsSp" hidden>${ic('x',16)} Stop</button></div>
+ <div id="rsMsg" class="mut" role="status" style="margin-top:8px">Point the camera at a QR code or barcode. You can also drop or paste (Ctrl+V) a picture here.</div></div>
+ <div class="panel"><div id="rsRes"><p class="mut" style="margin:0">Your result will show up here.</p></div><div id="rsHi"></div></div></div>`;
+ const msg=(t,e)=>{const m=g('#rsMsg');m.textContent=t;m.style.color=e?'var(--pdf)':''};
+ const stop=()=>{clearTimeout(timer);if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;torch=false;g('#rsVw').hidden=true;g('#rsTo').hidden=g('#rsSp').hidden=true;g('#rsCam').innerHTML=ic('camera')+' Scan with camera'};CL.push(stop);
+ const fc=document.createElement('canvas'),fx=fc.getContext('2d',{willReadFrequently:true});
+ const decode=async(src,w0,h0,sizes)=>{if(det){try{const r=await det.detect(src);if(r.length)return[r[0].rawValue,r[0].format]}catch(e){}}
+  if(window.jsQR)for(const m of sizes){const k=Math.min(1,m/Math.max(w0,h0)),w=Math.max(1,Math.round(w0*k)),h=Math.max(1,Math.round(h0*k));fc.width=w;fc.height=h;fx.drawImage(src,0,0,w,h);const q=jsQR(fx.getImageData(0,0,w,h).data,w,h);if(q&&q.data)return[q.data,'qr_code']}
+  return null};
+ const kind=(t,f)=>f&&f!='qr_code'?'Barcode · '+f.replace(/_/g,' '):/^https?:\/\//i.test(t)?'Link':/^WIFI:/i.test(t)?'Wi-Fi':/^mailto:/i.test(t)||/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(t)?'Email':/^tel:/i.test(t)||/^\+?[\d\s\-()]{7,16}$/.test(t)?'Phone':/^smsto?:/i.test(t)?'SMS':/^BEGIN:VCARD/i.test(t)?'Contact':/^geo:/i.test(t)?'Location':'Text';
+ const show=(t,f)=>{const k=kind(t,f),a=(h,l)=>`<a class="btn" href="${esc(h)}" target="_blank" rel="noopener noreferrer">${ic('ext',16)} ${l}</a>`;let act='',extra='',pw='';
+  if(k=='Link')act=a(t,'Open link');
+  else if(k=='Email')act=a(/^mailto:/i.test(t)?t:'mailto:'+t,'Write email');
+  else if(k=='Phone')act=a('tel:'+t.replace(/^tel:/i,'').replace(/[^\d+]/g,''),'Call');
+  else if(k=='Location')act=a('https://www.google.com/maps?q='+encodeURIComponent(t.slice(4).split(';')[0]),'Open map');
+  else if(k=='Wi-Fi'){const w={};t.slice(5).replace(/([A-Za-z]):((?:\\.|[^;\\])*);/g,(m,x,v)=>{w[x.toUpperCase()]=v.replace(/\\(.)/g,'$1')});pw=w.P||'';extra=`<p style="margin:10px 0 0"><b>Network:</b> ${esc(w.S||'?')}<br><b>Password:</b> ${esc(pw||'(none)')}<br><b>Security:</b> ${esc(w.T||'open')}</p>`}
+  g('#rsRes').innerHTML=`<span class="tag">${esc(k)}</span>${extra}<div class="rtx">${esc(t)}</div><div class="seg" style="justify-content:flex-start">${act}<button class="ghost" id="rsCp">${ic('copy',16)} Copy</button>${pw?'<button class="ghost" id="rsCw">Copy password</button>':''}${k=='Contact'?'<button class="ghost" id="rsVc">Save contact</button>':''}</div>${k=='Link'?'<small>Check the address before you open it.</small>':''}`;
+  g('#rsCp').onclick=e=>cpy(e.currentTarget,t);if(pw)g('#rsCw').onclick=e=>cpy(e.currentTarget,pw);if(k=='Contact')g('#rsVc').onclick=()=>dlb(new Blob([t],{type:'text/vcard'}),'contact.vcf')};
+ const drawH=()=>{g('#rsHi').innerHTML=hist.length?`<hr style="border:0;border-top:1px solid var(--bd);margin:16px 0"><div style="display:flex;justify-content:space-between;align-items:center"><b>Recent scans</b><button class="ghost" id="rsCl" style="padding:4px 10px">Clear</button></div>`+hist.map((h,i)=>`<div class="row" data-i="${i}" style="cursor:pointer"><div><b>${esc(String(h.t).slice(0,80))}</b><small>${new Date(h.d).toLocaleString()}</small></div></div>`).join(''):''};
+ g('#rsHi').onclick=e=>{if(e.target.closest('#rsCl')){hist=[];try{localStorage.removeItem(KEY)}catch(x){}return drawH()}const r=e.target.closest('.row'),h=r&&hist[+r.dataset.i];if(h)show(String(h.t),h.f)};
+ const got=(t,f)=>{beep();hist=[{t,f,d:Date.now()},...hist.filter(h=>h.t!==t)].slice(0,8);try{localStorage.setItem(KEY,JSON.stringify(hist))}catch(e){}drawH();show(t,f);msg('Code found. Tap "Scan with camera" to scan another.')};
+ const loop=async v=>{if(!stream)return;if(v.readyState>=2&&v.videoWidth){const r=await decode(v,v.videoWidth,v.videoHeight,[640]);if(r&&stream){got(r[0],r[1]);stop();return}}timer=setTimeout(()=>loop(v),140)};
+ const start=async()=>{if(stream)return;
+  try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280}},audio:false})}catch(e){stream=null;return msg('Live camera is not available here ('+(e.name||'error')+'). Allow camera access, or use "Upload image".',1)}
+  if(!det&&!window.jsQR){stop();return msg('The scanner library could not load. Check your internet connection and reload.',1)}
+  const vw=g('#rsVw'),v=vw.querySelector('video');vw.hidden=false;v.srcObject=stream;await v.play().catch(()=>{});g('#rsSp').hidden=false;
+  const tk=stream.getVideoTracks()[0],caps=tk.getCapabilities?tk.getCapabilities():{};g('#rsTo').hidden=!caps.torch;msg('Looking for a code…');loop(v)};
+ const fromFile=async f=>{if(!f||!f.type.startsWith('image/'))return msg('Please choose an image file.',1);if(!det&&!window.jsQR)return msg('The scanner library could not load. Check your internet connection and reload.',1);msg('Reading image…');
+  const bm=await createImageBitmap(f).catch(()=>null);if(!bm)return msg('Could not read that image.',1);const r=await decode(bm,bm.width,bm.height,[1600,900,500]);bm.close&&bm.close();r?got(r[0],r[1]):msg('No code found in this image. Try a sharper, closer photo.',1)};
+ g('#rsCam').onclick=start;g('#rsSp').onclick=()=>{stop();msg('Camera stopped.')};
+ g('#rsTo').onclick=async()=>{torch=!torch;try{await stream.getVideoTracks()[0].applyConstraints({advanced:[{torch}]})}catch(e){torch=!torch}};
+ g('#rsUp').onchange=e=>{fromFile(e.target.files[0]);e.target.value=''};
+ const pn=g('#rsCam').closest('.panel');pn.ondragover=e=>e.preventDefault();pn.ondrop=e=>{e.preventDefault();fromFile(e.dataTransfer.files[0])};
+ const pst=e=>{if(cur&&cur.id=='qrs'){const f=[...e.clipboardData.files].find(x=>x.type.startsWith('image/'));if(f)fromFile(f)}};addEventListener('paste',pst);CL.push(()=>removeEventListener('paste',pst));
+ drawH()};
+
+/* ---------- Unit converter ---------- */
+const unitUI=el=>{
+ const U={Length:{km:1000,m:1,cm:.01,mm:.001,mile:1609.344,yard:.9144,foot:.3048,inch:.0254},Weight:{kg:1,g:.001,mg:1e-6,tonne:1000,lb:.45359237,oz:.028349523125},Area:{'m²':1,'km²':1e6,hectare:1e4,acre:4046.8564224,'ft²':.09290304,'yd²':.83612736},Volume:{litre:1,mL:.001,'m³':1000,'gallon (US)':3.785411784,cup:.2365882365,tbsp:.01478676478125,tsp:.00492892159375},Speed:{'km/h':1/3.6,'m/s':1,mph:.44704,knot:.514444},Time:{second:1,minute:60,hour:3600,day:86400,week:604800},Data:{byte:1,KB:1024,MB:1048576,GB:1073741824,TB:1099511627776},Temperature:{'°C':1,'°F':1,K:1}};
+ const conv=(c,v,a,b)=>{if(c=='Temperature'){const C=a=='°C'?v:a=='°F'?(v-32)*5/9:v-273.15;return b=='°C'?C:b=='°F'?C*9/5+32:C+273.15}return v*U[c][a]/U[c][b]};
+ el.innerHTML=`<div class="panel"><div class="opts" style="margin-top:0"><div class="f"><label>Type</label><select id="uc">${Object.keys(U).map(k=>`<option>${k}</option>`).join('')}</select></div><div class="f"><label>Value</label><input id="uv" type="number" step="any" value="1" inputmode="decimal"></div><div class="f"><label>From</label><select id="ua"></select></div><div class="f"><label>To</label><select id="ub"></select></div></div>
+ <div class="row"><b id="ur" style="font-size:22px">–</b><button class="ghost" id="us" aria-label="Swap units">${ic('unit',16)} Swap</button></div><div class="stats" id="ual"></div></div>`;
+ const run=()=>{const c=$('#uc').value,v=num($('#uv').value),a=$('#ua').value,b=$('#ub').value;$('#ur').textContent=isNaN(v)?'–':fmt(conv(c,v,a,b))+' '+b;$('#ual').innerHTML=isNaN(v)?'':Object.keys(U[c]).map(x=>`<div><b style="font-size:17px">${fmt(conv(c,v,a,x))}</b><small>${x}</small></div>`).join('')};
+ const fill=()=>{const k=Object.keys(U[$('#uc').value]);$('#ua').innerHTML=$('#ub').innerHTML=k.map(x=>`<option>${x}</option>`).join('');$('#ub').selectedIndex=1;run()};
+ el.oninput=run;$('#uc').onchange=fill;$('#us').onclick=()=>{const a=$('#ua').value;$('#ua').value=$('#ub').value;$('#ub').value=a;run()};fill()};
+
+/* ---------- Age & date calculator ---------- */
+const ageUI=el=>{
+ const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'),pd=v=>v?new Date(v+'T00:00:00'):null,td=iso(new Date());
+ const ymd=(a,b)=>{let y=b.getFullYear()-a.getFullYear(),m=b.getMonth()-a.getMonth(),d=b.getDate()-a.getDate();if(d<0){m--;d+=new Date(b.getFullYear(),b.getMonth(),0).getDate()}if(m<0){y--;m+=12}return[y,m,d]},dd=(a,b)=>Math.round((b-a)/864e5),wk=d=>d.toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+ el.innerHTML=`<div class="two"><div class="panel"><h2 style="font-size:20px">Age</h2><div class="opts">${inp('d1','Date of birth','','date')+inp('d2','Age on',td,'date')}</div><div class="stats" id="ar"></div></div>
+ <div class="panel"><h2 style="font-size:20px">Days between two dates</h2><div class="opts">${inp('d3','From',td,'date')+inp('d4','To',td,'date')}</div><div class="stats" id="br"></div></div></div>`;
+ const run=()=>{const a=pd($('#o_d1').value),b=pd($('#o_d2').value),c=pd($('#o_d3').value),d=pd($('#o_d4').value),N='<small class="mut">Pick dates to see the result.</small>';
+  $('#ar').innerHTML=!a||!b?N:a>b?'<small class="mut">Date of birth is after the chosen date.</small>':(()=>{const[y,m,x]=ymd(a,b);let nb=new Date(b.getFullYear(),a.getMonth(),a.getDate());if(nb<b)nb.setFullYear(nb.getFullYear()+1);return S('Age',`${y}y ${m}m ${x}d`)+S('Total months',y*12+m)+S('Total days',dd(a,b).toLocaleString())+S('Next birthday in',dd(b,nb)+' days')+`<div style="grid-column:1/-1"><small>Next birthday falls on ${wk(nb)}</small></div>`})();
+  $('#br').innerHTML=!c||!d?N:(()=>{const n=dd(c,d),[lo,hi]=n<0?[d,c]:[c,d],[y,m,x]=ymd(lo,hi),ab=Math.abs(n);return S('Days',ab.toLocaleString())+S('Weeks',Math.floor(ab/7)+'w '+ab%7+'d')+S('Years, months, days',`${y}y ${m}m ${x}d`)+`<div style="grid-column:1/-1"><small>${wk(c)} to ${wk(d)}</small></div>`})()};
+ el.oninput=run;run()};
+
+/* ---------- Percent & loan calculator ---------- */
+const calcUI=el=>{
+ const R=[['','% of','',(a,b)=>fmt(a*b/100)],['','is what % of','',(a,b)=>b?fmt(a/b*100)+' %':'–'],['Change from','to','',(a,b)=>a?(b>=a?'+':'−')+fmt(Math.abs((b-a)/a*100))+' %':'–'],['Price','minus','% off',(a,b)=>fmt(a*(1-b/100))+' (you save '+fmt(a*b/100)+')'],['Price','plus','% tax',(a,b)=>fmt(a*(1+b/100))]];
+ el.innerHTML=`<div class="two"><div class="panel"><h2 style="font-size:20px;margin-bottom:6px">Percentages</h2>${R.map((r,i)=>`<div class="pr">${r[0]} <input class="ii" id="pa${i}" type="number" step="any" inputmode="decimal" aria-label="First number"> ${r[1]} <input class="ii" id="pb${i}" type="number" step="any" inputmode="decimal" aria-label="Second number"> ${r[2]} <span class="mut">=</span> <b id="pr${i}">–</b></div>`).join('')}</div>
+ <div class="panel"><h2 style="font-size:20px">Loan payment (EMI)</h2><div class="opts">${inp('la','Loan amount','','number','min=0 step=any')+inp('lr','Interest % per year','','number','min=0 step=any')+inp('lt','Time','','number','min=0 step=any')+sel('lu','Time in',[['y','Years'],['m','Months']])}</div><div class="stats" id="le"></div></div></div>`;
+ const run=()=>{R.forEach((r,i)=>{const a=num($('#pa'+i).value),b=num($('#pb'+i).value);$('#pr'+i).textContent=isNaN(a)||isNaN(b)?'–':r[3](a,b)});
+  const p=num($('#o_la').value),r=(num($('#o_lr').value)||0)/1200,t=num($('#o_lt').value),n=Math.round($('#o_lu').value=='y'?t*12:t);
+  $('#le').innerHTML=p>0&&n>0?(()=>{const e=r?p*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1):p/n,tot=e*n;return S('Monthly payment',fmt(e))+S('Total interest',fmt(tot-p))+S('Total paid',fmt(tot))})():'<small class="mut">Enter the amount and time to see the monthly payment.</small>'};
+ el.oninput=run;run()};
+
+/* ---------- Text tools ---------- */
+const txtUI=el=>{let prev='';
+ const OP={up:s=>s.toUpperCase(),low:s=>s.toLowerCase(),title:s=>s.toLowerCase().replace(/(^|[\s\-(])(\p{L})/gu,(m,a,b)=>a+b.toUpperCase()),sent:s=>s.toLowerCase().replace(/(^\s*|[.!?]\s+)(\p{L})/gu,(m,a,b)=>a+b.toUpperCase()),sp:s=>s.replace(/[ \t]+/g,' ').replace(/^ +| +$/gm,''),bl:s=>s.split('\n').filter(l=>l.trim()).join('\n'),dup:s=>[...new Set(s.split('\n'))].join('\n'),sort:s=>s.split('\n').sort((a,b)=>a.localeCompare(b)).join('\n'),rev:s=>[...s].reverse().join('')};
+ const B=[['up','UPPERCASE'],['low','lowercase'],['title','Title Case'],['sent','Sentence case'],['sp','Fix spaces'],['bl','Remove blank lines'],['dup','Remove duplicate lines'],['sort','Sort A–Z'],['rev','Reverse']];
+ el.innerHTML=`<div class="panel"><textarea id="tx" rows="10" placeholder="Type or paste your text here"></textarea><div class="seg" id="tb" style="justify-content:flex-start">${B.map(b=>`<button class="chip" data-k="${b[0]}">${b[1]}</button>`).join('')}</div><div class="seg" style="justify-content:flex-start"><button class="ghost" id="tu">Undo</button><button class="ghost" id="tcp">${ic('copy',16)} Copy</button><button class="ghost" id="tcl">Clear</button></div></div>`;
+ const t=$('#tx');$('#tb').onclick=e=>{const b=e.target.closest('[data-k]');if(b){prev=t.value;t.value=OP[b.dataset.k](t.value)}};
+ $('#tu').onclick=()=>{const x=t.value;t.value=prev;prev=x};$('#tcp').onclick=e=>cpy(e.currentTarget,t.value);$('#tcl').onclick=()=>{prev=t.value;t.value=''}};
+
+/* ---------- Stopwatch & timer ---------- */
+const timerUI=el=>{let mode='s',run=0,acc=0,t0=0,tick=0,laps=[],tot=3e5;
+ el.innerHTML=`<div class="panel ctr"><div class="seg" id="tmM"><button class="chip on" data-m="s">Stopwatch</button><button class="chip" data-m="c">Countdown</button></div>
+ <div class="seg" id="tmIn" hidden><input class="ii" id="tmMin" type="number" min="0" value="5" aria-label="Minutes"> min <input class="ii" id="tmSec" type="number" min="0" max="59" value="0" aria-label="Seconds"> sec ${[1,5,10,25].map(m=>`<button class="ghost" data-p="${m}">${m} min</button>`).join('')}</div>
+ <div id="tmD" role="timer" style="font:800 clamp(44px,12vw,84px)/1.1 'Bricolage Grotesque',sans-serif;font-variant-numeric:tabular-nums;margin:12px 0">00:00.0</div>
+ <div class="seg"><button id="tmG">Start</button><button class="ghost" id="tmL">Lap</button><button class="ghost" id="tmR">Reset</button></div><div id="tmLs" style="text-align:left"></div></div>`;
+ const f=ms=>{ms=Math.max(0,ms);const h=ms/36e5|0,m=String(ms/6e4%60|0).padStart(2,'0'),s=String(ms/1e3%60|0).padStart(2,'0');return(h?h+':':'')+m+':'+s+'.'+(ms/100%10|0)},el_=()=>acc+(run?performance.now()-t0:0),inTot=()=>Math.max(0,(+$('#tmMin').value||0)*60+(+$('#tmSec').value||0))*1e3;
+ const btn=()=>g('#tmG').textContent=run?'Pause':acc?'Resume':'Start',lapList=()=>{g('#tmLs').innerHTML=laps.map((v,i)=>`<div class="row"><div><b>Lap ${laps.length-i}</b></div><span>+${f(v-(laps[i+1]||0))}</span><code style="flex:none">${f(v)}</code></div>`).join('')};
+ const draw=()=>{const e=el_(),d=g('#tmD');if(mode=='s')return d.textContent=f(e);const r=tot-e;if(r<=0&&run){run=0;acc=tot;clearInterval(tick);d.textContent="Time's up!";beep(3);btn();return}d.textContent=f(r)};
+ const reset=()=>{run=0;acc=0;clearInterval(tick);laps=[];lapList();if(mode=='c')tot=inTot();btn();draw()};
+ $('#tmG').onclick=()=>{if(run){acc=el_();run=0;clearInterval(tick)}else{if(mode=='c'){if(acc>=tot)acc=0;if(!acc)tot=inTot();if(!tot)return}t0=performance.now();run=1;tick=setInterval(draw,50)}btn();draw()};
+ $('#tmL').onclick=()=>{if(mode=='s'&&(run||acc)){laps.unshift(el_());lapList()}};$('#tmR').onclick=reset;
+ $('#tmM').onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;mode=b.dataset.m;document.querySelectorAll('#tmM .chip').forEach(x=>x.classList.toggle('on',x==b));$('#tmIn').hidden=mode=='s';$('#tmL').hidden=mode=='c';reset()};
+ $('#tmIn').oninput=()=>{if(!run&&!acc){tot=inTot();draw()}};$('#tmIn').onclick=e=>{const b=e.target.closest('[data-p]');if(b){$('#tmMin').value=b.dataset.p;$('#tmSec').value=0;if(!run){acc=0;tot=inTot();btn();draw()}}};
+ CL.push(()=>clearInterval(tick));reset()};
+
+const NT=[
+ {id:'qrs',c:'scan',nw:1,n:'QR & Barcode Scanner',d:'Scan QR codes and barcodes with your camera or from a picture. Open links, copy text, read Wi-Fi codes.',custom:qrsUI},
+ {id:'unit',c:'hdy',nw:1,n:'Unit Converter',d:'Length, weight, area, volume, speed, time, data and temperature.',custom:unitUI},
+ {id:'age',c:'hdy',nw:1,n:'Age & Date Calculator',d:'Exact age, next birthday and days between two dates.',custom:ageUI},
+ {id:'calc',c:'hdy',nw:1,n:'Percent & Loan Calculator',d:'Percentages, discounts, tax and monthly loan payments (EMI).',custom:calcUI},
+ {id:'txt',c:'hdy',nw:1,n:'Text Tools',d:'Change case, fix spaces, remove blank or duplicate lines, sort and reverse.',custom:txtUI},
+ {id:'timer',c:'hdy',nw:1,n:'Stopwatch & Timer',d:'Stopwatch with laps, and a countdown timer with an alarm.',custom:timerUI}];
+T.splice(1,0,NT[0]);T.push(...NT.slice(1));
+}
+
+{const IM={scan:'scan',merge:'merge',split:'split',rotate:'rotate',pnum:'pnum',wm:'wm',compress:'compress',p2i:'p2i',i2p:'i2p',resize:'resize',qr:'qr',pass:'pass',count:'count',qrs:'qrscan',unit:'unit',age:'age',calc:'calc',txt:'txt',timer:'timer'};T.forEach(t=>t.i=ic(IM[t.id]||'file',26))}
+CC.scan='var(--scn)';
+
+grid();
+route();
+</script></body></html>
